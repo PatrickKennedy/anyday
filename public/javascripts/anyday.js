@@ -25,30 +25,9 @@
                     scope: {
                         task: '=',
                     },
-                    template: '{{ task.name }} - <any-time-since></any-time-since>'
-                }
-            }
-        ])
-        .directive('anyTimeSince', ['$interval',
-            function($interval){
-                return function (scope, element, attrs){
-                    var interval;
-
-                    function updateTime(){
-                        element.text(scope.task.last.relative());
-                    }
-
-                    interval = $interval(function() {
-                        updateTime();
-                    }, 5000);
-
-                    scope.$watch(scope.task.last, function(){
-                        updateTime();
-                    });
-
-                    element.on('$destroy', function(){
-                        $interval.cancel(interval);
-                    });
+                    //TODO: Decrease .relative's granularity
+                    // see: http://sugarjs.com/api/Date/relative
+                    template: '{{ task.name }} - {{ task.last.relative() }}'
                 }
             }
         ])
