@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  div
+    ul
+    li(ng-repeat="task in tasks" ng-click="update_time()")
+      <any-task task="task"></any-task>
