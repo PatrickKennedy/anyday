@@ -4,6 +4,7 @@
   "description": "Date Agnostic To-Do List",
   "main": "./bin/www",
   "author": "Patrick Kennedy <p@trickkennedy.com>",
+  "repository": "https://github.com/PatrickKennedy/anyday/",
   "license": "ISC",
   "dependencies": {
     "body-parser": "~1.12.0",
