@@ -7,6 +7,7 @@ var express = require('express')
   , bodyParser = require('body-parser')
   , rethinkdb = require('rethinkdb')
 
+  , api = require('./routes/api')
   , routes = require('./routes/index')
   , users = require('./routes/users')
   ;
@@ -27,6 +28,7 @@ app.use(cookieParser());
 
 // attach relevant routes to url bases
 app.use('/', routes);
+app.use('/api/v1/', api);
 app.use('/users', users);
 
 // error handling middleware

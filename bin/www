@@ -47,13 +47,25 @@ async.waterfall([
       callback(err, connection);
     });
   },
-  function createTable(connection, callback) {
+  function createTasksTable(connection, callback) {
     //Create the table if needed.
     r.tableList().contains('tasks').do(function(containsTable) {
       return r.branch(
         containsTable,
         {created: 0},
         r.tableCreate('tasks')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createTaskFixturesTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('task_fixtures').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('task_fixtures')
       );
     }).run(connection, function(err) {
       callback(err, connection);
