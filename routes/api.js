@@ -3,19 +3,21 @@ var express = require('express')
   , router = express.Router()
   ;
 
-function getTableJSON(req, res, next, table) {
-  r
-  .db('anyday')
-  .table(table)
-  .run(req.app._rdbConn, function(err, cursor) {
-    if(err) return next(err);
-
-    //Retrieve all the todos in an array.
-    cursor.toArray(function(err, result) {
+function getTableJSON(table) {
+  return function(req, res, next){
+    r
+    .db('anyday')
+    .table(table)
+    .run(req.app._rdbConn, function(err, cursor) {
       if(err) return next(err);
-      res.json(result);
+
+      //Retrieve all the todos in an array.
+      cursor.toArray(function(err, result) {
+        if(err) return next(err);
+        res.json(result);
+      });
     });
-  });
+  }
 }
 
 /*
@@ -34,16 +36,12 @@ router
    *
    * GET /task-fixtures/ returns a list of task fixture objects
    */
-  .get('/task-fixtures/', function(req, res, next) {
-    getTableJSON(req, res, next, 'task_fixtures');
-  })
+  .get('/task-fixtures/', getTableJSON('task_fixtures'))
   
   /*
    * GET /tasks/ returns a list of task objects
    */
-  .get('/tasks/', function(req, res, next) {
-    getTableJSON(req, res, next, 'tasks');
-  })
+  .get('/tasks/', getTableJSON('tasks'))
 
   /*
    * POST /tasks/ creates a task and returns the result
