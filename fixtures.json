@@ -1,0 +1,12 @@
+{
+  "task_fixtures": [
+    {
+      "id": "shower",
+      "name": "Shower"
+    },
+    {
+      "id": "water-plants",
+      "name": "Water Plants"
+    }
+  ]
+}

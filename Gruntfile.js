@@ -1,8 +1,14 @@
+var fs = require('fs')
+  , config = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json')), 'utf8')
+  ;
+
+
 module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     html2js: {
       options: {
         jade: {
@@ -21,6 +27,7 @@ module.exports = function(grunt) {
         dest: 'tmp/<%= pkg.name %>.templates.js'
       }
     },
+
     nodemon: {
       dev: {
         script: './bin/www',
@@ -29,12 +36,28 @@ module.exports = function(grunt) {
         }
       }
     },
+
+    exec: {
+      install_fixture: {
+        cmd: function(fixture) {
+          var cmd = [
+            'rethinkdb import',
+            '-c '+ config.rethinkdb.host +':'+ config.rethinkdb.port,
+            '--table anyday.'+ fixture,
+            '-f ./fixtures/'+ fixture +'.json',
+            '--format json',
+          ]
+          return cmd.join(' ')
+        }
+      }
+    },
   });
 
-  // Load the plugin that provides the "html2js" task.
   grunt.loadNpmTasks('grunt-html2js');
-  // Load the plugin that provides the "nodemon" task.
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-exec');
+  
+  grunt.registerTask('install-fixture', []);
 
   // Default task(s).
   grunt.registerTask('default', []);
