@@ -6,5 +6,10 @@ block content
 
   div
     ul
+    li(ng-repeat="fixture in task_fixtures" ng-click="update_time()")
+      any-fixture(fixture="fixture")
+
+  div
+    ul
     li(ng-repeat="task in tasks" ng-click="update_time()")
-      <any-task task="task"></any-task>
+      any-task(task="task")
