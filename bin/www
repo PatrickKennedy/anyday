@@ -5,11 +5,12 @@
  */
 var async = require('async')
   , debug = require('debug')('anyday:server')
+  , fs = require('fs')
   , http = require('http')
   , path = require('path')
   , r = require('rethinkdb')
-  , config = require(path.join(__dirname, '..', 'config.js'))
   , app = require('../app')
+  , config = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json')), 'utf8')
   , server
   ;
 
