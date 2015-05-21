@@ -1,7 +1,4 @@
-var fs = require('fs')
-  , config = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json')), 'utf8')
-  ;
-
+var config = require('./config');
 
 module.exports = function(grunt) {
 
