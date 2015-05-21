@@ -74,7 +74,10 @@
                     },
                     //TODO: Decrease .relative's granularity
                     // see: http://sugarjs.com/api/Date/relative
-                    template: '{{ task.name }} - {{ task.when.relative() }}'
+                    template: '{{ task.name }} - {{ task.when.relative() }}',
+                    link: function(scope, element, attrs) {
+                        scope.task.when = Date.create(scope.task.when);
+                    }
                 }
             }
         ])
