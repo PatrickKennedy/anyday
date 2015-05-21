@@ -14,7 +14,7 @@ function tableToJSON(table, callback) {
     ;
 
     if (callback !== undefined)
-      op = callback(op);
+      op = callback(op, req, res, next);
 
     op
     .run(req.app._rdbConn, function(err, cursor) {
@@ -40,7 +40,7 @@ function interactToJSON(table, callback) {
     ;
     
     if (callback !== undefined)
-      op = callback(op);
+      op = callback(op, req, res, next);
 
     op
     .run(req.app._rdbConn, function(err, result) {
@@ -105,8 +105,6 @@ router
         });
       }
     })
-    
-    
   })
 
 
@@ -115,61 +113,34 @@ router
    *
    * GET /tasks/:id returns the sepcific task
    */
-  .get('/tasks/:id', function(req, res, next) {
+  .get('/tasks/:id', interactToJSON('tasks', function(op, req){
     var id = req.params.id;
-
-    r
-    .db('anyday')
-    .table('tasks')
-    .get(id)
-    .run(req.app._rdbConn, function(err, result) {
-      if(err) return next(err);
-
-      res.json(result);
-    });
-  })
+    return op.get(id);
+  }))
 
   /*
    * PUT /tasks/:id updates the specified task
    */
-  .put('/tasks/:id', function(req, res, next) {
+  .put('/tasks/:id', interactToJSON('tasks', function(op, req){
     var id = req.params.id
       , body = req.body
       ;
 
+    // convert text timestamp to native rdb tamestamp
     body.when = r.ISO8601(body.when);
 
-    r
-    .db('anyday')
-    .table('tasks')
+    return op
     .get(id)
     .update(body, {returnChanges: true})
-    .run(req.app._rdbConn, function(err, result) {
-      if(err) {
-        return next(err);
-      }
-
-      res.json(result);
-    });
-  })
+  }))
 
   /*
    * DELETE /tasks/:id deletes the specified task
    */
-  .delete('/tasks/:id', function(req, res, next) {
+  .delete('/tasks/:id', interactToJSON('tasks', function(op, req){
     var id = req.params.id;
-    
-    r
-    .db('anyday')
-    .table('tasks')
-    .get(id)
-    .delete()
-    .run(req.app._rdbConn, function(err, result) {
-      if(err) return next(err);
-
-      res.json(result);
-    });
-  })
+    return op.get(id).delete();
+  }))
 ;
 
 module.exports = router;
