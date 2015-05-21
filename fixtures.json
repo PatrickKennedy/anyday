@@ -1,6 +1,10 @@
 {
   "task_fixtures": [
     {
+      "id": "config",
+      "delete_missing": "true"
+    },
+    {
       "id": "shower",
       "name": "Shower"
     },
