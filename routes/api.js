@@ -3,11 +3,20 @@ var express = require('express')
   , router = express.Router()
   ;
 
-function getTableJSON(table) {
+/*
+ * Convience function to templatize access to list of table items
+ */
+function tableToJSON(table, callback) {
   return function(req, res, next){
-    r
+    op = r
     .db('anyday')
     .table(table)
+    ;
+
+    if (callback !== undefined)
+      op = callback(op);
+
+    op
     .run(req.app._rdbConn, function(err, cursor) {
       if(err) return next(err);
 
@@ -16,6 +25,28 @@ function getTableJSON(table) {
         if(err) return next(err);
         res.json(result);
       });
+    });
+  }
+}
+
+/*
+ * Convience function to templatize table interaction
+ */
+function interactToJSON(table, callback) {
+  return function(req, res, next){
+    op = r
+    .db('anyday')
+    .table(table)
+    ;
+    
+    if (callback !== undefined)
+      op = callback(op);
+
+    op
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) return next(err);
+
+      res.json(result);
     });
   }
 }
@@ -36,12 +67,16 @@ router
    *
    * GET /task-fixtures/ returns a list of task fixture objects
    */
-  .get('/task-fixtures/', getTableJSON('task_fixtures'))
+  .get('/task-fixtures/', tableToJSON('task_fixtures', function(op){
+    return op.orderBy({index: 'name'});
+  }))
   
   /*
    * GET /tasks/ returns a list of task objects
    */
-  .get('/tasks/', getTableJSON('tasks'))
+  .get('/tasks/', tableToJSON('tasks', function(op){
+    return op.orderBy({index: 'when'});
+  }))
 
   /*
    * POST /tasks/ creates a task and returns the result
@@ -49,21 +84,29 @@ router
   .post('/tasks/', function(req, res, next) {
     var task = req.body;
     task.when = r.ISO8601(task.when);
-    task.createdAt = r.now();
-
-    console.dir(task);
+    task.created = r.now();
 
     r
     .db('anyday')
     .table('tasks')
-    .insert(task, {returnChanges: true})
-    .run(req.app._rdbConn, function(err, result) {
-      if(err) {
-        return next(err);
-      }
+    .filter({name: task.name})
+    .isEmpty()
+    .run(req.app._rdbConn, function(err, empty){
+      if(err) return next(err);
+      if (empty) {
+        r
+        .db('anyday')
+        .table('tasks')
+        .insert(task, {returnChanges: true})
+        .run(req.app._rdbConn, function(err, result) {
+          if(err) return next(err);
 
-      res.json(result);
-    });
+          res.json(result);
+        });
+      }
+    })
+    
+    
   })
 
 
@@ -74,6 +117,16 @@ router
    */
   .get('/tasks/:id', function(req, res, next) {
     var id = req.params.id;
+
+    r
+    .db('anyday')
+    .table('tasks')
+    .get(id)
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) return next(err);
+
+      res.json(result);
+    });
   })
 
   /*
@@ -83,6 +136,8 @@ router
     var id = req.params.id
       , body = req.body
       ;
+
+    body.when = r.ISO8601(body.when);
 
     r
     .db('anyday')
@@ -103,7 +158,19 @@ router
    */
   .delete('/tasks/:id', function(req, res, next) {
     var id = req.params.id;
+    
+    r
+    .db('anyday')
+    .table('tasks')
+    .get(id)
+    .delete()
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) return next(err);
+
+      res.json(result);
+    });
   })
 ;
 
 module.exports = router;
+
