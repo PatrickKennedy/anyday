@@ -46,7 +46,25 @@ router
   /*
    * POST /tasks/ creates a task and returns the result
    */
-  .post('/tasks/', function(req, res, next) {})
+  .post('/tasks/', function(req, res, next) {
+    var task = req.body;
+    task.when = r.ISO8601(task.when);
+    task.createdAt = r.now();
+
+    console.dir(task);
+
+    r
+    .db('anyday')
+    .table('tasks')
+    .insert(task, {returnChanges: true})
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
+    });
+  })
 
 
   /*
@@ -62,7 +80,22 @@ router
    * PUT /tasks/:id updates the specified task
    */
   .put('/tasks/:id', function(req, res, next) {
-    var id = req.params.id;
+    var id = req.params.id
+      , body = req.body
+      ;
+
+    r
+    .db('anyday')
+    .table('tasks')
+    .get(id)
+    .update(body, {returnChanges: true})
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
+    });
   })
 
   /*

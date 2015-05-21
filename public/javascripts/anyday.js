@@ -33,9 +33,10 @@
                     , task = angular.copy(fixture)
                     ;
 
+                delete task.id;
                 task.when = Date.create('now');
-                api.update(task).success(function(result) {
-                    $scope.tasks(task);
+                api.create(task).success(function(result) {
+                    $scope.tasks.push(task);
                     console.log(result);
                 }).error(function(error){
                     console.log(error);

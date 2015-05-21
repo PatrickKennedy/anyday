@@ -6,8 +6,8 @@ block content
 
   div
     ul
-    li(ng-repeat="fixture in task_fixtures" ng-click="update_time()")
-      any-fixture(fixture="fixture")
+    li(ng-repeat="fixture in task_fixtures")
+      any-fixture(fixture="fixture" ng-click="create_task()")
 
   div
     ul
