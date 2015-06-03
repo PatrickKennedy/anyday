@@ -1,16 +1,28 @@
-var express = require('express')
-  , app = express()
-  , path = require('path')
-  , favicon = require('serve-favicon')
-  , logger = require('morgan')
+var bodyParser = require('body-parser')
   , cookieParser = require('cookie-parser')
-  , bodyParser = require('body-parser')
-  , rethinkdb = require('rethinkdb')
+  , express = require('express')
+  , expressValidator = require('express-validator')
+  , favicon = require('serve-favicon')
+  , flash = require('connect-flash')
+  , fs = require('fs')
+  , logger = require('morgan')
+  , path = require('path')
+  , parseurl = require('parseurl')
+
+  , session = require('express-session')
+  , SessionStore = require('session-rethinkdb')(session)
+  
+  , passwordless = require('./controllers/passwordless')
 
   , api = require('./routes/api')
+  , auth = require('./routes/auth')
   , routes = require('./routes/index')
   , users = require('./routes/users')
+
+  , app = express()
+  , config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')), 'utf8')
   ;
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +37,21 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(expressValidator());
+expressValidator.validator.extend('toLowerCase', function (str) { return str.toLowerCase(); });
+
+app.use(flash());
+
+// sessions
+app.use(session({
+  secret: config.express.secret,
+  //store: new SessionStore({servers:[config.rethinkdb]}),
+  resave: false,
+  saveUninitialized: false,
+}));
+
+// authentication
+passwordless(app);
 
 // attach relevant routes to url bases
 app.use('/', routes);
