@@ -6,6 +6,7 @@
     "db": "anyday"
   },
   "express": {
-     "port": 3000
+    "port": 3000,
+    "secret": "im so secret you dont even know"
   }
 }
