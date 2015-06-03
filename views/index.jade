@@ -3,6 +3,14 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+    if user
+      | , #{user.email}
+
+  if ~user
+    div
+      form(ng-submit="submit_login()", ng-controller="AnydayLoginFormController")
+        input(type="text", name="email", ng-model="email" placeholder="email")
+        input(type="submit", value="Login/Register")
 
   div
     ul
@@ -13,3 +21,4 @@ block content
     ul
     li(ng-repeat="task in tasks" ng-click="update_time()")
       any-task(task="task")
+

@@ -1,5 +1,7 @@
 var express = require('express')
+  , passwordless = require('passwordless')
   , r = require('rethinkdb')
+  , User = require('../models/users')
   , router = express.Router()
   ;
 
@@ -74,7 +76,7 @@ router
  * Task Agnostic Functions
  */
 router.route('/tasks/')
-  
+
   /*
    * GET /tasks/ returns a list of task objects
    */
@@ -112,8 +114,8 @@ router.route('/tasks/')
   })
 ;
 
-  /*
-   * Task Sepcific Functions
+/*
+ * Task Sepcific Functions
  */
 router.route('/tasks/:id')
 
@@ -150,5 +152,66 @@ router.route('/tasks/:id')
   }))
 ;
 
+
+/*
+ * Auth Functions
+ */
+router
+  /*
+   * GET login screen
+   */
+  .get('/login', function(req, res) {
+    res.render('auth', { user: req.user });
+  })
+
+  /*
+   * GET logout
+   */
+  .get('/logout', passwordless.logout(), function(req, res) {
+    res.json({result:'success'});
+  })
+
+  /*
+   * POST login screen
+   */
+  .post('/sendtoken',
+    // Input validation
+    function(req, res, next) {
+      req.checkBody('email', 'Please provide a valid email address').isLength(1,200).isEmail();
+      req.sanitize('email').toLowerCase();
+      req.sanitize('email').trim();
+
+      var errors = req.validationErrors(true);
+      if (errors)
+        res.json({result:'error', errors:errors});
+      else
+        next();
+    },
+
+    // wrap requestToken to provide access to req.app._rdbConn
+    function(req, res, next) {
+      passwordless.requestToken(
+        function(email, delivery, callback) {
+          console.log(email)
+          console.log(delivery)
+
+          User.getOrCreate(email, req.app._rdbConn, function(err, user) {
+            if(err) return callback(err);
+            return callback(null, user.id);
+          })
+        },
+        {
+          userField: 'email',
+        }
+      )(req, res, next);
+    },
+
+    function(req, res, next) {
+      res.json({result:'success'});
+    }
+  );
+
 module.exports = router;
+
+
 

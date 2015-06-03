@@ -56,6 +56,21 @@
                 });
             }
         }])
+        .controller('AnydayLoginFormController', ['$scope', 'AnyAPI', function($scope, api) {
+            $scope.submit_login = function (){
+                console.log('attempting to send token');
+                if ($scope.email) {
+                    api.sendtoken($scope.email)
+                    .success(function(result){
+                        console.log('token sent successfully');
+                    })
+                    .error(function(error){
+                        console.log('token failed to send: '+ error);
+                    })
+                    ;
+                }
+            }
+        }])
         .directive('anyFixture', [
             function () {
                 return {
@@ -103,8 +118,13 @@
               delete: function(id) {
                 var url = prefix+'/tasks/' + id;
                 return $http.delete(url);
+              },
+              sendtoken: function(email) {
+                var url = prefix+'/sendtoken/';
+                return $http.post(url, {email: email});
               }
             };
           })
         ;
 }(angular));
+
