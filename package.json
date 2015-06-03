@@ -33,6 +33,9 @@
     "grunt-exec": "^0.4.6",
     "grunt-html2js": "^0.3.2",
     "grunt-nodemon": "^0.4.0",
+    "grunt-concurrent": "^1.0.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-node-inspector": "^0.2.0",
     "watchify": "^3.1.2"
   },
   "scripts": {

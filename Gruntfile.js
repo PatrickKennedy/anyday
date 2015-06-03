@@ -25,11 +25,31 @@ module.exports = function(grunt) {
       }
     },
 
+    concurrent: {
+      dev: {
+        tasks: ['nodemon', 'node-inspector'],
+        options: {
+          logConcurrentOutput: true
+        }
+      }
+    },
+
+    "node-inspector": {
+      dev: {
+        options: {
+          'save-live-edit': true,
+          'no-preload': true,
+          'hidden': ['node_modules'],
+        }
+      }
+    },
+
     nodemon: {
       dev: {
         script: './bin/www',
         options: {
           delay: 500,
+          nodeArgs: ['--debug'],
         }
       }
     },
