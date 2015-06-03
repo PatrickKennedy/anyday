@@ -63,25 +63,29 @@ router
   })
 
   /*
-   * Task Agnostic Functions
-   *
    * GET /task-fixtures/ returns a list of task fixture objects
    */
   .get('/task-fixtures/', tableToJSON('task_fixtures', function(op){
     return op.orderBy({index: 'name'});
   }))
+;
+
+/*
+ * Task Agnostic Functions
+ */
+router.route('/tasks/')
   
   /*
    * GET /tasks/ returns a list of task objects
    */
-  .get('/tasks/', tableToJSON('tasks', function(op){
+  .get(tableToJSON('tasks', function(op){
     return op.orderBy({index: 'when'});
   }))
 
   /*
    * POST /tasks/ creates a task and returns the result
    */
-  .post('/tasks/', function(req, res, next) {
+  .post(function(req, res, next) {
     var task = req.body;
     task.when = r.ISO8601(task.when);
     task.created = r.now();
@@ -106,14 +110,17 @@ router
       }
     })
   })
-
+;
 
   /*
    * Task Sepcific Functions
-   *
+ */
+router.route('/tasks/:id')
+
+  /*
    * GET /tasks/:id returns the sepcific task
    */
-  .get('/tasks/:id', interactToJSON('tasks', function(op, req){
+  .get(interactToJSON('tasks', function(op, req){
     var id = req.params.id;
     return op.get(id);
   }))
@@ -121,7 +128,7 @@ router
   /*
    * PUT /tasks/:id updates the specified task
    */
-  .put('/tasks/:id', interactToJSON('tasks', function(op, req){
+  .put(interactToJSON('tasks', function(op, req){
     var id = req.params.id
       , body = req.body
       ;
@@ -137,7 +144,7 @@ router
   /*
    * DELETE /tasks/:id deletes the specified task
    */
-  .delete('/tasks/:id', interactToJSON('tasks', function(op, req){
+  .delete(interactToJSON('tasks', function(op, req){
     var id = req.params.id;
     return op.get(id).delete();
   }))
