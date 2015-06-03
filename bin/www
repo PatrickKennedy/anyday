@@ -47,18 +47,11 @@ async.waterfall([
       callback(err, connection);
     });
   },
-  function createTasksTable(connection, callback) {
-    //Create the table if needed.
-    r.tableList().contains('tasks').do(function(containsTable) {
-      return r.branch(
-        containsTable,
-        {created: 0},
-        r.tableCreate('tasks')
-      );
-    }).run(connection, function(err) {
-      callback(err, connection);
-    });
-  },
+
+  /*
+   * Ceate TaskFixtures Table and Index
+   */
+
   function createTaskFixturesTable(connection, callback) {
     //Create the table if needed.
     r.tableList().contains('task_fixtures').do(function(containsTable) {
@@ -73,11 +66,11 @@ async.waterfall([
   },
   function createIndex(connection, callback) {
     //Create the index if needed.
-    r.table('tasks').indexList().contains('createdAt').do(function(hasIndex) {
+    r.table('task_fixtures').indexList().contains('name').do(function(hasIndex) {
       return r.branch(
         hasIndex,
         {created: 0},
-        r.table('tasks').indexCreate('createdAt')
+        r.table('task_fixtures').indexCreate('name')
       );
     }).run(connection, function(err) {
       callback(err, connection);
@@ -85,7 +78,76 @@ async.waterfall([
   },
   function waitForIndex(connection, callback) {
     //Wait for the index to be ready.
-    r.table('tasks').indexWait('createdAt').run(connection, function(err, result) {
+    r.table('task_fixtures').indexWait('name').run(connection, function(err, result) {
+      callback(err, connection);
+    });
+  },
+
+  /*
+   * Ceate Tasks Table and Index
+   */
+  function createTasksTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('tasks').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('tasks')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('tasks').indexList().contains('when').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('tasks').indexCreate('when')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function waitForIndex(connection, callback) {
+    //Wait for the index to be ready.
+    r.table('tasks').indexWait('when').run(connection, function(err, result) {
+      callback(err, connection);
+    });
+  },
+
+  /*
+   * Ceate Users Table and Index
+   */
+
+  function createUsersTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('users').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('users')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('users').indexList().contains('email').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('users').indexCreate('email')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function waitForIndex(connection, callback) {
+    //Wait for the index to be ready.
+    r.table('users').indexWait('email').run(connection, function(err, result) {
       callback(err, connection);
     });
   }
