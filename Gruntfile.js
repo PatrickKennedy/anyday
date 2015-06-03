@@ -71,6 +71,9 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-html2js');
+  grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-exec');
   
