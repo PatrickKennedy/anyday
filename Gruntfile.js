@@ -1,10 +1,22 @@
 var config = require('./config');
 
 module.exports = function(grunt) {
+  var plugins = require('matchdep').filterDev('grunt-*');
+  plugins.forEach(grunt.loadNpmTasks);
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
+    watch: {
+      jade: {
+        files: ['./public/views/*.jade'],
+        tasks: ['html2js'],
+        options: {
+          spawn: false,
+        }
+      }
+    },
 
     html2js: {
       options: {
@@ -17,17 +29,17 @@ module.exports = function(grunt) {
       },
       main: {
         options: {
-          base: '',
+          base: './public/views',
           module: 'anyday.templates'
         },
-        src: ['./views/*.dir.jade'],
-        dest: 'tmp/<%= pkg.name %>.templates.js'
+        src: ['./public/views/*.jade'],
+        dest: './public/javascripts/<%= pkg.name %>.templates.js'
       }
     },
 
     concurrent: {
       dev: {
-        tasks: ['nodemon', 'node-inspector'],
+        tasks: ['nodemon', 'node-inspector', 'watch'],
         options: {
           logConcurrentOutput: true
         }
@@ -50,6 +62,7 @@ module.exports = function(grunt) {
         options: {
           delay: 500,
           nodeArgs: ['--debug'],
+          ignore: ['node_modules/**', 'public/javascripts/**'],
         }
       }
     },
@@ -70,12 +83,12 @@ module.exports = function(grunt) {
     },
   });
 
-  grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-concurrent');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-node-inspector');
-  grunt.loadNpmTasks('grunt-nodemon');
-  grunt.loadNpmTasks('grunt-exec');
+  //grunt.loadNpmTasks('grunt-html2js');
+  //grunt.loadNpmTasks('grunt-concurrent');
+  //grunt.loadNpmTasks('grunt-contrib-watch');
+  //grunt.loadNpmTasks('grunt-node-inspector');
+  //grunt.loadNpmTasks('grunt-nodemon');
+  //grunt.loadNpmTasks('grunt-exec');
   
   grunt.registerTask('install-fixture', []);
 
