@@ -80,8 +80,10 @@ router.route('/tasks/')
   /*
    * GET /tasks/ returns a list of task objects
    */
-  .get(tableToJSON('tasks', function(op){
-    return op.orderBy({index: 'when'});
+  .get(tableToJSON('tasks', function(op, req){
+    op = op.getAll(req.user, {index: 'user_id'});
+    op = op.orderBy('when');
+    return op;
   }))
 
   /*
@@ -89,12 +91,14 @@ router.route('/tasks/')
    */
   .post(function(req, res, next) {
     var task = req.body;
+    task.user_id = req.user;
     task.when = r.ISO8601(task.when);
     task.created = r.now();
 
     r
     .db('anyday')
     .table('tasks')
+    .getAll(req.user, {index: 'user_id'})
     .filter({name: task.name})
     .isEmpty()
     .run(req.app._rdbConn, function(err, empty){
