@@ -6,11 +6,8 @@ block content
     if user
       | , #{user.email}
 
-  if ~user
-    div
-      form(ng-submit="submit_login()", ng-controller="AnydayLoginFormController")
-        input(type="text", name="email", ng-model="email" placeholder="email")
-        input(type="submit", value="Login/Register")
+  unless user
+    any-login-form
 
   div
     ul
