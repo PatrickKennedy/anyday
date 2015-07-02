@@ -176,6 +176,21 @@ router
   })
 
   /*
+   * GET login url
+   */
+  .get('/tokenlogin', function(req, res) {
+    var email = req.query.email
+        , token = req.query.token
+        ;
+    User.getByEmail(email, req.app._rdbConn, function(err, user) {
+      if(err) return callback(err);
+      if(user) return res.json({url:'/?uid='+ user.id +'&token='+ token});
+      user;
+    })
+  })
+
+
+  /*
    * POST login screen
    */
   .post('/sendtoken',

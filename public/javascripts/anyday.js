@@ -51,6 +51,10 @@
               sendtoken: function(email) {
                 var url = prefix+'/sendtoken/';
                 return $http.post(url, {email: email});
+              },
+              tokenlogin: function(email, token) {
+                var url = prefix+'/tokenlogin/';
+                return $http.get(url, {params: {email: email, token: token}});
               }
             };
           }
@@ -62,9 +66,9 @@
      * Contains all logic related to the login functionality
      */
     angular.module('any.login', ['any.api', 'anyday.templates', 'login.jade'])
-        .controller('AnydayLoginFormController', [
-            '$scope', 'AnyAPI',
-            function($scope, api) {
+        .controller('AnyLoginFormController', [
+            '$scope', '$location', 'AnyAPI',
+            function($scope, $location, api) {
                 $scope.enter_token = false;
                 $scope.reset_token = function (){ $scope.enter_token = false; }
                 $scope.submit_login = function (){
@@ -77,6 +81,21 @@
                         })
                         .error(function(error){
                             console.log('token failed to send: '+ error);
+                        })
+                        ;
+                    }
+                }
+                $scope.submit_token = function (){
+                    console.log('attempting to submit token');
+                    if ($scope.email) {
+                        api.tokenlogin($scope.email, $scope.token)
+                        .success(function(result){
+                            console.log('token login url retrieved successfully: '+ result.url);
+                            location.replace(result.url);
+                            //$location.path(result.url)
+                        })
+                        .error(function(error){
+                            console.log('token failed to retrieve: '+ error);
                         })
                         ;
                     }
