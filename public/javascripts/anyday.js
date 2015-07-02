@@ -111,12 +111,155 @@
         ])
     ;
 
+    /*
+     * AnyTasks module
+     * Contains the display logic for the task lists
+     */
+    angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade'])
+        .controller('AnyTasksController', [
+            '$scope', 'AnyAPI',
+            function($scope, api) {
+                $scope.update_time = function (){
+                    var task = $scope.tasks[this.$index]
+                        , old_when = task.when
+                        ;
+                    task.when = Date.create('now');
+                    api.update(task).success(function(result) {
+                        console.log(result);
+                    }).error(function(error){
+                        task.when = old_when;
+                        console.log(error);
+                    });
+                }
+            }
+        ])
+        .directive('anyTasksList', [
+            function () {
+                return {
+                    templateUrl: 'tasks.jade',
+                    controller: 'AnyTasksController',
+                }
+            }
+        ])
+        .directive('anyTask', [
+            function () {
+                return {
+                    scope: {
+                        task: '=',
+                    },
+                    //TODO: Decrease .relative's granularity
+                    // see: http://sugarjs.com/api/Date/relative
+                    template: '{{ task.name }} - {{ task.when.relative() }}',
+                    link: function(scope, element, attrs) {
+                        scope.task.when = Date.create(scope.task.when);
+                    }
+                }
+            }
+        ])
+    ;
 
+    /*
+     * AnyPanel module
+     * Contains any panel related logic
+     * Fixtures and Details panes will be displayed here
+     */
+    angular.module('any.panel', ['anyday.templates', 'panel.jade'])
+        .controller('AnyPanelController', [
+
+        ])
+        .directive('anyPanel', [
+            function () {
+                return {
+                    transclude: true,
+                    templateUrl: 'panel.jade',
+                }
+            }
+        ])
+    ;
+
+    /*
+     * AnyFixtures module
+     * Contains the display logic for the fixture list
+     */
+    angular.module('any.fixtures', ['any.api', 'anyday.templates', 'fixtures.jade'])
+        .controller('AnyFixturesController', [
+            '$scope', 'AnyAPI',
+            function($scope, api) {
+                function _create_task(task) {
+                    api.create(task).success(function(result) {
+                        $scope.tasks.push(task);
+                        console.log(result);
+                    }).error(function(error){
+                        console.log(error);
+                    });
+                }
+                
+                $scope.create_from_fixture = function (){
+                    var fixture = $scope.task_fixtures[this.$index]
+                        , task = angular.copy(fixture)
+                        ;
+    
+                    delete task.id;
+                    task.when = Date.create('now');
+                    _create_task(task);
+                }
+
+                $scope.create_custom = function (){
+                    _create_task({
+                        name: $scope.custom_name,
+                        when: Date.create('now'),
+                    });
+                }
+            }
+        ])
+        .directive('anyFixturesList', [
+            function () {
+                return {
+                    templateUrl: 'fixtures.jade',
+                    controller: 'AnyFixturesController',
+                }
+            }
+        ])
+        .directive('anyFixture', [
+            function () {
+                return {
+                    scope: {
+                        fixture: '=',
+                    },
+                    template: '{{ fixture.name }}',
+                }
+            }
+        ])
+    ;
+
+    /*
+     * AnyDetails module
+     * Contains the display logic for the task details pane
+     */
+    angular.module('any.details', ['any.api', 'anyday.templates', 'details.jade'])
+        .controller('AnydetailsController', [
+
+        ])
+        .directive('anyDetailPane', [
+            function () {
+                return {
+                    scope: {
+                        task: '=',
+                    },
+                    templateUrl: 'details.jade',
+                }
+            }
+        ])
+    ;
+    
     /*
      * Anyday module
      * Contains core website logic
      */
-    angular.module('anyday', ['any.api', 'any.login', 'anyday.templates', 'login.jade'])
+    angular.module(
+        'anyday',
+        ['any.api', 'any.login', 'any.tasks', 'any.fixtures', 'any.details']
+    )
         .controller('AnydayController', [
             '$scope', 'AnyAPI',
             function($scope, api) {
@@ -144,61 +287,7 @@
             }).error(function(error){
                 console.log(error);
             });
-
-            $scope.create_task = function (){
-                var fixture = $scope.task_fixtures[this.$index]
-                    , task = angular.copy(fixture)
-                    ;
-
-                delete task.id;
-                task.when = Date.create('now');
-                api.create(task).success(function(result) {
-                    $scope.tasks.push(task);
-                    console.log(result);
-                }).error(function(error){
-                    console.log(error);
-                });
-            }
-
-            $scope.update_time = function (){
-                var task = $scope.tasks[this.$index]
-                    , old_when = task.when
-                    ;
-                task.when = Date.create('now');
-                api.update(task).success(function(result) {
-                    console.log(result);
-                }).error(function(error){
-                    task.when = old_when;
-                    console.log(error);
-                });
-            }
         }])
-        
-        .directive('anyFixture', [
-            function () {
-                return {
-                    scope: {
-                        fixture: '=',
-                    },
-                    template: '{{ fixture.name }}'
-                }
-            }
-        ])
-        .directive('anyTask', [
-            function () {
-                return {
-                    scope: {
-                        task: '=',
-                    },
-                    //TODO: Decrease .relative's granularity
-                    // see: http://sugarjs.com/api/Date/relative
-                    template: '{{ task.name }} - {{ task.when.relative() }}',
-                    link: function(scope, element, attrs) {
-                        scope.task.when = Date.create(scope.task.when);
-                    }
-                }
-            }
-        ])
     ;
 }(angular));
 

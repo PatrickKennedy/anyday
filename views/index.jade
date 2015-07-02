@@ -9,13 +9,7 @@ block content
   unless user
     any-login-form
 
-  div
-    ul
-    li(ng-repeat="fixture in task_fixtures")
-      any-fixture(fixture="fixture" ng-click="create_task()")
+  any-fixtures-list
 
-  div
-    ul
-    li(ng-repeat="task in tasks" ng-click="update_time()")
-      any-task(task="task")
+  any-tasks-list
 
