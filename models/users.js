@@ -54,7 +54,7 @@ User.getOrCreate = function (email, conn, done) {
       email: email,
     })
     user = user.map(function(k, v) {
-      if (typeof v == "function") return v();
+      if (is.function(v)) return v();
       return v;
     })
 

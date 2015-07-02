@@ -4,7 +4,7 @@ A date-agnostic to-do list. Rather than plan out your chores, let Anyday keep
 track of how long it's been since you last completed it, and you decide how
 long is too long.
 
-## Installation
+# Installation
 
 Anyday uses node.js and RethinkDB for it's backend infrastructure.
 

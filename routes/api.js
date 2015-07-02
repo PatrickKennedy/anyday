@@ -185,7 +185,6 @@ router
     User.getByEmail(email, req.app._rdbConn, function(err, user) {
       if(err) return callback(err);
       if(user) return res.json({url:'/?uid='+ user.id +'&token='+ token});
-      user;
     })
   })
 
