@@ -37,8 +37,11 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(expressValidator());
-expressValidator.validator.extend('toLowerCase', function (str) { return str.toLowerCase(); });
+app.use(expressValidator({
+  customSanitizers: {
+    toLowerCase: function (str) { return str.toLowerCase(); }
+  }
+}));
 
 app.use(flash());
 
