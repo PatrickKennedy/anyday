@@ -20,7 +20,7 @@ var bodyParser = require('body-parser')
   , users = require('./routes/users')
 
   , app = express()
-  , config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')), 'utf8')
+  , config = require('./config')
   ;
 
 
