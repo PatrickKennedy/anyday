@@ -8,5 +8,10 @@
   "express": {
     "port": 3000,
     "secret": "im so secret you dont even know"
+  },
+  "email": {
+    "api_key": "key-bae7d968909d21f5995dc70b729c89ba",
+    "domain": "sandbox67f6fc6974f14544a63271ff16899cd3.mailgun.org",
+    "sender": "noreply@sandbox67f6fc6974f14544a63271ff16899cd3.mailgun.org"
   }
 }
