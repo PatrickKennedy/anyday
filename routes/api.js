@@ -206,23 +206,20 @@ router
         next();
     },
 
-    // wrap requestToken to provide access to req.app._rdbConn
-    function(req, res, next) {
-      passwordless.requestToken(
-        function(email, delivery, callback) {
-          console.log(email)
-          console.log(delivery)
+    passwordless.requestToken(
+      function(email, delivery, callback, req) {
+        console.log(email)
+        console.log(delivery)
 
-          User.getOrCreate(email, req.app._rdbConn, function(err, user) {
-            if(err) return callback(err);
-            return callback(null, user.id);
-          })
-        },
-        {
-          userField: 'email',
-        }
-      )(req, res, next);
-    },
+        User.getOrCreate(email, req.app._rdbConn, function(err, user) {
+          if(err) return callback(err);
+          return callback(null, user.id);
+        })
+      },
+      {
+        userField: 'email',
+      }
+    ),
 
     function(req, res, next) {
       res.json({result:'success'});
