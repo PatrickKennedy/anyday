@@ -1,0 +1,202 @@
+#!/usr/bin/env node
+
+/*
+ * Module dependencies.
+ */
+var async = require('async')
+  , debug = require('debug')('anyday:server')
+  , fs = require('fs')
+  , http = require('http')
+  , path = require('path')
+  , r = require('rethinkdb')
+  , app = require('../app')
+  , config = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json')), 'utf8')
+  , server
+  ;
+
+
+function startExpress(connection) {
+  app.set('port', process.env.PORT || config.express.port || '3000');
+  app._rdbConn = connection;
+
+  server = http.createServer(app)
+  . listen(app.get('port'))
+  . on('error', onError)
+  . on('listening', onListening)
+  ;
+}
+
+
+/*
+ * Connect to rethinkdb, create the needed tables/indexes and then start express.
+ * Create tables/indexes then start express
+ */
+async.waterfall([
+  function connect(callback) {
+    r.connect(config.rethinkdb, callback);
+  },
+  function createDatabase(connection, callback) {
+    //Create the database if needed.
+    r.dbList().contains(config.rethinkdb.db).do(function(containsDb) {
+      return r.branch(
+        containsDb,
+        {created: 0},
+        r.dbCreate(config.rethinkdb.db)
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+
+  /*
+   * Ceate TaskFixtures Table and Index
+   */
+
+  function createTaskFixturesTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('task_fixtures').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('task_fixtures')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('task_fixtures').indexList().contains('name').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('task_fixtures').indexCreate('name')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function waitForIndex(connection, callback) {
+    //Wait for the index to be ready.
+    r.table('task_fixtures').indexWait('name').run(connection, function(err, result) {
+      callback(err, connection);
+    });
+  },
+
+  /*
+   * Ceate Tasks Table and Index
+   */
+  function createTasksTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('tasks').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('tasks')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('tasks').indexList().contains('when').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('tasks').indexCreate('when')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function waitForIndex(connection, callback) {
+    //Wait for the index to be ready.
+    r.table('tasks').indexWait('when').run(connection, function(err, result) {
+      callback(err, connection);
+    });
+  },
+
+  /*
+   * Ceate Users Table and Index
+   */
+
+  function createUsersTable(connection, callback) {
+    //Create the table if needed.
+    r.tableList().contains('users').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('users')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('users').indexList().contains('email').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('users').indexCreate('email')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+  function waitForIndex(connection, callback) {
+    //Wait for the index to be ready.
+    r.table('users').indexWait('email').run(connection, function(err, result) {
+      callback(err, connection);
+    });
+  }
+], function(err, connection) {
+  if(err) {
+    console.error(err);
+    process.exit(1);
+    return;
+  }
+
+  startExpress(connection);
+});
+
+
+/*
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+
+/*
+ * Event listener for HTTP server "listening" event.
+ */
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

@@ -1,0 +1,7 @@
+div
+  ul
+    li
+      input(type="text" name="custom_name" ng-model="custom_name" ng-keyup="$event.keyCode == 13 && create_custom()")
+    li(ng-repeat="fixture in task_fixtures")
+      any-fixture(fixture="fixture" ng-click="create_from_fixture()")
+

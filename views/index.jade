@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+    if user
+      | , #{user.email}
+
+  unless user
+    any-login-form
+
+  any-fixtures-list
+
+  any-tasks-list
+
