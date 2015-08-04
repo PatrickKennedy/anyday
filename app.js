@@ -15,7 +15,6 @@ var bodyParser = require('body-parser')
   , passwordless = require('./controllers/passwordless')
 
   , api = require('./routes/api')
-  , auth = require('./routes/auth')
   , routes = require('./routes/index')
   , users = require('./routes/users')
 
