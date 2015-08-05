@@ -1,8 +1,17 @@
 require('sugar');
 
 var config = require('./config.json')
-    , local = require('./local.json')
+    , local = {}
     ;
+
+try {
+  local = require('./local.json');
+} catch (err) {
+  if (err.code != "MODULE_NOT_FOUND") {
+    throw err
+  }
+  console.log(err.code)
+}
 
 config = Object.merge(config, local);
 
