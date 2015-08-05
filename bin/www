@@ -10,7 +10,7 @@ var async = require('async')
   , path = require('path')
   , r = require('rethinkdb')
   , app = require('../app')
-  , config = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json')), 'utf8')
+  , config = require('../config')
   , server
   ;
 
