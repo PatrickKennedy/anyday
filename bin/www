@@ -53,7 +53,7 @@ async.waterfall([
    */
 
   function createTaskFixturesTable(connection, callback) {
-    //Create the table if needed.
+    // Create the table if needed.
     r.tableList().contains('task_fixtures').do(function(containsTable) {
       return r.branch(
         containsTable,
@@ -64,8 +64,38 @@ async.waterfall([
       callback(err, connection);
     });
   },
+  function installFixtures(connection, callback) {
+    // Sync fixtures to the fixtures.json
+    var fixture_sets = require('../fixtures.json')
+        , task_fixture_table = 'task_fixtures'
+        , task_fixtures = fixture_sets[task_fixture_table]
+        , task_config = task_fixtures.shift()
+        , task_ids = []
+        ;
+    
+    r
+    .table(task_fixture_table)
+    .insert(task_fixtures, {conflict: 'replace'})
+    .run(connection, function(err) {
+      if (err) return callback(err, connection);
+      
+      if (task_config['delete_missing']) {
+        task_fixtures.forEach(function (fixture) { task_ids.push(fixture['id']); });
+        r
+        .table(task_fixture_table)
+        .filter(
+          function (doc) { return r.expr(task_ids).contains(doc('id')).not() }
+        )
+        .delete()
+        .run(connection, function(err) { return callback(err, connection); })
+      } else {
+        return callback(err, connection);
+      }
+    });
+        
+  },
   function createIndex(connection, callback) {
-    //Create the index if needed.
+    // Create the index if needed.
     r.table('task_fixtures').indexList().contains('name').do(function(hasIndex) {
       return r.branch(
         hasIndex,
@@ -77,7 +107,7 @@ async.waterfall([
     });
   },
   function waitForIndex(connection, callback) {
-    //Wait for the index to be ready.
+    // Wait for the index to be ready.
     r.table('task_fixtures').indexWait('name').run(connection, function(err, result) {
       callback(err, connection);
     });
