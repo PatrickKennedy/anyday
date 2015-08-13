@@ -12,7 +12,7 @@ try {
   }
 }
 
-config = Object.merge(config, local);
+config = Object.merge(config, local, true);
 
 config.rethinkdb.host = process.env.RETHINKDB_HOST || config.rethinkdb.host
 config.rethinkdb.port = process.env.RETHINKDB_PORT || config.rethinkdb.port
