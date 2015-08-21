@@ -185,6 +185,14 @@
     .controller('AnyFixturesController', [
       '$scope', 'AnyAPI',
       function($scope, api) {
+        $scope.task_fixtures = []
+        $scope.fixture = {}
+        api.fixtures().success(function(result) {
+          $scope.task_fixtures = result;
+        }).error(function(error){
+          console.log(error);
+        });
+
         function _create_task(task) {
           api.create(task).success(function(result) {
             $scope.tasks.push(task);
@@ -192,6 +200,15 @@
           }).error(function(error){
             console.log(error);
           });
+        }
+
+        $scope.transform_tag = function(new_tag){
+          console.log("transforming tag")
+          return {
+            id: undefined,
+            name: new_tag,
+            frequency: 1,
+          };
         }
 
         $scope.create_from_fixture = function (){
@@ -230,6 +247,21 @@
         }
       }
     ])
+    .directive('anyNumber', [
+      function() {
+        return {
+          require: 'ngModel',
+          link: function(scope, element, attrs, ngModel) {
+            ngModel.$parsers.push(function(value) {
+              return '' + value;
+            });
+            ngModel.$formatters.push(function(value) {
+              return parseFloat(value, 10);
+            });
+          }
+        }
+      }
+    ])
   ;
 
   /*
@@ -258,7 +290,10 @@
    */
   angular.module(
     'anyday',
-    ['any.api', 'any.login', 'any.tasks', 'any.fixtures', 'any.details']
+    [
+     'any.api', 'any.login', 'any.tasks', 'any.fixtures', 'any.details',
+     'ngSanitize', 'ui.select'
+    ]
   )
     .controller('AnydayController', [
       '$scope', 'AnyAPI',
@@ -274,12 +309,12 @@
       //  }
       //]
 
-      $scope.task_fixtures = []
-      api.fixtures().success(function(result) {
-        $scope.task_fixtures = result;
-      }).error(function(error){
-        console.log(error);
-      });
+      //$scope.task_fixtures = []
+      //api.fixtures().success(function(result) {
+      //  $scope.task_fixtures = result;
+      //}).error(function(error){
+      //  console.log(error);
+      //});
 
       $scope.tasks = []
       api.tasks().success(function(result) {

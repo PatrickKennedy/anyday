@@ -1,7 +1,20 @@
 div
-  ul
-    li
-      input(type="text" name="custom_name" ng-model="custom_name" ng-keyup="$event.keyCode == 13 && create_custom()")
-    li(ng-repeat="fixture in task_fixtures")
-      any-fixture(fixture="fixture" ng-click="create_from_fixture()")
+  | and, I want to
+  ui-select(tagging="$scope.transform_tag", ng-model="fixture.selected" title="")
+    ui-select-match(placeholder="do something...")
+      {{ $select.selected.name }}
 
+    ui-select-choices(repeat="fixture in task_fixtures | filter: $select.search track by fixture.id")
+      div(ng-if="fixture.isTag" ng-bind-html="fixture.name +' '+ $select.taggingLabel | highlight: $select.search")
+      div(ng-if="!fixture.isTag" ng-bind-html="fixture.name | highlight: $select.search")
+      small
+        | frequency
+        {{ fixture.frequency }}
+
+  // select(name="action" ng-model="action")
+  //  option(ng-repeat="fixture in task_fixtures" value="{{ fixture.id }}") {{ fixture.name }}
+  | every
+  input(any-number type="number" name="frequency" ng-model="fixture.selected.frequency")
+  |, or so, days.
+  {{ fixture.selected }}
+  {{ transform_tag }}
