@@ -6,11 +6,23 @@
     },
     {
       "id": "shower",
-      "name": "Shower"
+      "name": "Shower",
+      "frequency": "1"
     },
     {
       "id": "water-plants",
-      "name": "Water Plants"
+      "name": "Water Plants",
+      "frequency": "3"
+    },
+    {
+      "id": "wash-windows",
+      "name": "Wash Windows",
+      "frequency": "7"
+    },
+    {
+      "id": "clean-disposal",
+      "name": "Clean Disposal",
+      "frequency": "31"
     }
   ]
 }
