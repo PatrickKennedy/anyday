@@ -55,7 +55,11 @@
        tokenlogin: function(email, token) {
         var url = prefix+'/tokenlogin/';
         return $http.get(url, {params: {email: email, token: token}});
-       }
+       },
+       logout: function() {
+        var url = prefix+'/logout/';
+        return $http.get(url);
+       },
       };
      }
     ])
@@ -106,6 +110,35 @@
       function () {
         return {
           templateUrl: 'login.jade',
+          controller: 'AnyLoginFormController',
+        }
+      }
+    ])
+  ;
+
+  /*
+   * AnySidenav module
+   * Contains the display logic for the task details pane
+   */
+  angular.module('any.sidenav', ['any.api', 'anyday.templates', 'sidenav.jade'])
+    .controller('AnySidenavController', [
+      '$scope', 'AnyAPI',
+      function ($scope, api) {
+        $scope.logout = function() {
+          api.logout()
+          .success(function(result) {
+            console.log('logged out : '+ result.result);
+            location.replace('/');
+          });
+        }
+      }
+    ])
+    .directive('anySidenav', [
+      'AnyConfig',
+      function (config) {
+        return {
+          templateUrl: 'sidenav.jade',
+          controller: 'AnySidenavController',
         }
       }
     ])
@@ -194,6 +227,9 @@
       function($scope, api) {
         $scope.task_fixtures = []
         $scope.fixture = {}
+        $scope.$select = {
+
+        }
         api.fixtures().success(function(result) {
           $scope.task_fixtures = result;
         }).error(function(error){
@@ -209,7 +245,23 @@
           });
         }
 
-        $scope.transform_tag = function(new_tag){
+        $scope.get_matches = function(search_text) {
+          query = angular.lowercase(search_text);
+          var results = $scope.task_fixtures.filter(function(fixture) {
+            return (fixture.name.toLowerCase().indexOf(query) === 0);
+          });
+          if (results.length != 1) {
+            results.unshift({
+              id: '',
+              name: search_text,
+              frequency: 1
+            });
+          }
+
+          return results;
+        }
+
+        $scope.transform_tag = function(new_tag) {
           console.log("transforming tag")
           return {
             id: undefined,
@@ -219,9 +271,13 @@
         }
 
         $scope.create_from_fixture = function (){
-          var fixture = $scope.task_fixtures[this.$index]
+          var fixture = $scope.fixture.selected
             , task = angular.copy(fixture)
             ;
+
+          // return if the task hasn't been generated
+          if (task === null)
+            return;
 
           delete task.id;
           task.when = Date.create('now');
@@ -298,13 +354,17 @@
   angular.module(
     'anyday',
     [
-     'any.api', 'any.login', 'any.tasks', 'any.fixtures', 'any.details',
-     'ngSanitize', 'ui.select'
+     'any.api', 'any.config', 'any.login', 'any.fixtures', 'any.tasks', 'any.sidenav',
+     'ngMaterial',
     ]
   )
     .controller('AnydayController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
+      '$scope', '$mdSidenav', 'AnyAPI', 'AnyConfig',
+      function($scope, $mdSidenav, api, config) {
+        $scope.config = config;
+        $scope.toggle_sidenav = function() {
+          $mdSidenav('menu').toggle();
+        };
       //$scope.tasks = [
       //  {
       //    name: "Shower",

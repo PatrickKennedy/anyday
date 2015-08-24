@@ -1,20 +1,26 @@
-div
+div.md-subhead(layout="row" layout-align="start center" flex)
   | and, I want to
-  ui-select(tagging="$scope.transform_tag", ng-model="fixture.selected" title="")
-    ui-select-match(placeholder="do something...")
-      {{ $select.selected.name }}
-
-    ui-select-choices(repeat="fixture in task_fixtures | filter: $select.search track by fixture.id")
-      div(ng-if="fixture.isTag" ng-bind-html="fixture.name +' '+ $select.taggingLabel | highlight: $select.search")
-      div(ng-if="!fixture.isTag" ng-bind-html="fixture.name | highlight: $select.search")
-      small
-        | frequency
-        {{ fixture.frequency }}
-
-  // select(name="action" ng-model="action")
-  //  option(ng-repeat="fixture in task_fixtures" value="{{ fixture.id }}") {{ fixture.name }}
+  md-autocomplete(
+    md-floating-label="do something..."
+    md-autoselect="true"
+    md-select-on-match="true"
+    md-selected-item="fixture.selected"
+    md-search-text="$select.search_text"
+    md-items="fixture in get_matches($select.search_text)"
+    md-item-text="fixture.name"
+  )
+    md-item-template
+      span(md-highlight-text="$select.search_text") {{ fixture.name }}
   | every
-  input(any-number type="number" name="frequency" ng-model="fixture.selected.frequency")
+  md-input-container
+    label
+      | frequency
+    input(any-number type="number" name="frequency" ng-model="fixture.selected.frequency")
   |, or so, days.
-  {{ fixture.selected }}
-  {{ transform_tag }}
+
+//div(layout="row")
+//  {{ fixture.selected }}
+
+.md-actions(layout="row" layout-align="end center")
+  md-button(ng-click="create_from_fixture()") Make It So
+

@@ -1,11 +1,23 @@
-div(ng-controller="AnyLoginFormController")
-  form(ng-submit="submit_login()" ng-hide="enter_token")
-    input(type="text" name="email" ng-model="email" placeholder="email")
-    input(type="submit", value="Login/Register")
+div.md-subhead(layout="column")
+  form(ng-hide="enter_token" ng-submit="submit_login()")
+    div(layout="row" layout-align="start center")
+      | Hi, you can call me
+      md-input-container
+        label
+          | email
+        input(type="text" name="email" ng-model="email" placeholder="email")
+      |.
 
-  div(ng-show="enter_token")
+    .md-actions(ng-hide="enter_token" layout="row" layout-align="end center")
+      md-button(type="submit") Login/Register
+
+  div(ng-show="enter_token" layout="row" layout-align="start center")
     p Enter the token you recieved here:
-    input(type="text" ng-model="token" ng-keyup="$event.keyCode == 13 && submit_token()" placeholder="token")
+    md-input-container
+      label
+        | token
+      input(type="text" ng-model="token" ng-keyup="$event.keyCode == 13 && submit_token()" placeholder="token")
 
-    div
-      span(ng-click="reset_token()") Resend token?
+.md-actions(ng-show="enter_token" layout="row" layout-align="end center")
+  md-button(ng-click="submit_token()") Submit token
+  md-button(ng-click="reset_token()") Resend token

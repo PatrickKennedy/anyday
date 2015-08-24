@@ -1,6 +1,5 @@
 div
-  ul
-    li(ng-click="show_fixtures()")
-      Add New Task
-    li(ng-repeat="task in tasks" ng-click="update_time()")
+  md-list
+    md-subheader.md-no-sticky Tasks
+    md-list-item.md-2-line(ng-repeat="task in tasks" ng-click="update_time()")
       any-task(task="task")
