@@ -140,6 +140,18 @@ async.waterfall([
       callback(err, connection);
     });
   },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('tasks').indexList().contains('user_id').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('tasks').indexCreate('user_id')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
   function waitForIndex(connection, callback) {
     //Wait for the index to be ready.
     r.table('tasks').indexWait('when').run(connection, function(err, result) {
