@@ -3,7 +3,9 @@ div.md-subhead(layout="row" layout-align="start center" flex)
   md-autocomplete(
     md-floating-label="do something..."
     md-autoselect="true"
-    md-select-on-match="true"
+    md-select-on-match="false"
+    md-no-cache="true"
+    md-delay="150"
     md-selected-item="fixture.selected"
     md-search-text="$select.search_text"
     md-items="fixture in get_matches($select.search_text)"
@@ -23,4 +25,3 @@ div.md-subhead(layout="row" layout-align="start center" flex)
 
 .md-actions(layout="row" layout-align="end center")
   md-button(ng-click="create_from_fixture()") Make It So
-
