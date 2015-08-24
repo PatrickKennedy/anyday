@@ -5,7 +5,7 @@
    */
   angular.module('any.config', [])
     .provider('AnyConfig', function () {
-      var config = Object.extend({
+      var config = Object.extended({
          user: null,
       });
       return {

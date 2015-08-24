@@ -20,8 +20,8 @@ html(ng-app='anyday')
     if user
       script.
         angular.module('any.config')
-          .config(function (AppConfigProvider) {
-            AppConfigProvider.set({
+          .config(function (AnyConfigProvider) {
+            AnyConfigProvider.set({
                 user: !{JSON.stringify(user)}
             });
           });
