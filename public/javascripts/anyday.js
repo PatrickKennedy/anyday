@@ -115,10 +115,17 @@
    * AnyTasks module
    * Contains the display logic for the task lists
    */
-  angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade'])
+  angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
       '$scope', 'AnyAPI',
       function($scope, api) {
+        $scope.tasks = [];
+        api.tasks().success(function(result) {
+          $scope.tasks = result;
+        }).error(function(error){
+          console.log(error);
+        });
+
         $scope.update_time = function (){
           var task = $scope.tasks[this.$index]
             , old_when = task.when
@@ -149,7 +156,7 @@
           },
           //TODO: Decrease .relative's granularity
           // see: http://sugarjs.com/api/Date/relative
-          template: '{{ task.name }} - {{ task.when.relative() }}',
+          templateUrl: 'any-task.jade',
           link: function(scope, element, attrs) {
             scope.task.when = Date.create(scope.task.when);
           }
@@ -315,13 +322,6 @@
       //}).error(function(error){
       //  console.log(error);
       //});
-
-      $scope.tasks = []
-      api.tasks().success(function(result) {
-        $scope.tasks = result;
-      }).error(function(error){
-        console.log(error);
-      });
     }])
   ;
 }(angular));
