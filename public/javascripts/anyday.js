@@ -199,25 +199,6 @@
   ;
 
   /*
-   * AnyPanel module
-   * Contains any panel related logic
-   * Fixtures and Details panes will be displayed here
-   */
-  angular.module('any.panel', ['anyday.templates', 'panel.jade'])
-    .controller('AnyPanelController', [
-
-    ])
-    .directive('anyPanel', [
-      function () {
-        return {
-          transclude: true,
-          templateUrl: 'panel.jade',
-        }
-      }
-    ])
-  ;
-
-  /*
    * AnyFixtures module
    * Contains the display logic for the fixture list
    */
