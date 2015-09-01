@@ -159,10 +159,8 @@
           console.log(error);
         });
 
-        $scope.update_time = function (){
-          var task = $scope.tasks[this.$index]
-            , old_when = task.when
-            ;
+        $scope.update_time = function (task){
+          var old_when = task.when;
           task.when = Date.create('now');
           api.update(task).success(function(result) {
             console.log(result);
@@ -184,12 +182,8 @@
     .directive('anyTask', [
       function () {
         return {
-          scope: {
-            task: '=',
-          },
           //TODO: Decrease .relative's granularity
           // see: http://sugarjs.com/api/Date/relative
-          templateUrl: 'any-task.jade',
           link: function(scope, element, attrs) {
             scope.task.when = Date.create(scope.task.when);
           }

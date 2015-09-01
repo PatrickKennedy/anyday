@@ -6,3 +6,14 @@ body {
 a {
   color: #00B7FF;
 }
+
+md-list-item > *, md-list-item > .md-list-item-inner > *, md-list-item .md-list-item-inner > *, md-list-item .md-list-item-inner > .md-list-item-inner > * {
+  -webkit-user-select: none;
+  /* Chrome all / Safari all */
+  -moz-user-select: none;
+  /* Firefox all */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Likely future */
+}

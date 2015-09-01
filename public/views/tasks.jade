@@ -1,5 +1,8 @@
-div
+div(ng-controller="AnyTasksController")
   md-list
     md-subheader.md-no-sticky Tasks
-    md-list-item.md-2-line(ng-repeat="task in tasks" ng-click="update_time()")
-      any-task(task="task")
+    md-list-item.md-2-line(any-task ng-repeat="task in tasks" ng-click=";")
+      .md-list-item-text
+        h3 {{ task.name }}
+        h4 {{ task.when.relative() }}
+      md-icon.md-secondary(aria-label="Update Time", md-font-icon="material-icons" ng-click="update_time(task)") check
