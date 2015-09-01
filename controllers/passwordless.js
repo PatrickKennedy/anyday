@@ -50,7 +50,7 @@ module.exports = function(app) {
         }
         callback(null);
       });
-    }
+    }, { ttl: 60*60*24*30 }
   );
 
   app.use(passwordless.sessionSupport());
