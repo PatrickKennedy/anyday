@@ -1,8 +1,13 @@
-angular.module('anyday.templates', ['any-task.jade', 'details.jade', 'fixtures.jade', 'login.jade', 'panel.jade', 'sidenav.jade', 'tasks.jade']);
+angular.module('anyday.templates', ['any-task-bottom-sheet.jade', 'any-task.jade', 'details.jade', 'fixtures.jade', 'login.jade', 'panel.jade', 'sidenav.jade', 'tasks.jade']);
+
+angular.module("any-task-bottom-sheet.jade", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("any-task-bottom-sheet.jade",
+    "<md-bottom-sheet layout=\"row\" controller=\"AnyTasksBottomSheetController\" class=\"md-grid\"><md-list flex layout=\"row\" layout-align=\"center center\"><md-list-item ng-repeat=\"item in items\"><md-button ng-click=\"menu_click($index)\" class=\"md-grid-item-content\"><md-icon md-font-icon=\"material-icons\">{{ item.icon }}</md-icon><div class=\"md-grid-text\">{{ item.name }}</div></md-button></md-list-item></md-list></md-bottom-sheet>");
+}]);
 
 angular.module("any-task.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("any-task.jade",
-    "<div layout=\"column\" class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-divider></md-divider>");
+    "<md-list-item ng-click=\"show_bottom_sheet($event)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time()\" class=\"md-secondary\">check</md-icon></md-list-item>");
 }]);
 
 angular.module("details.jade", []).run(["$templateCache", function($templateCache) {
@@ -12,7 +17,7 @@ angular.module("details.jade", []).run(["$templateCache", function($templateCach
 
 angular.module("fixtures.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("fixtures.jade",
-    "<div layout=\"row\" layout-align=\"start center\" flex class=\"md-subhead\">and, I want to<md-autocomplete md-floating-label=\"do something...\" md-autoselect=\"true\" md-select-on-match=\"false\" md-no-cache=\"true\" md-delay=\"150\" md-selected-item=\"fixture.selected\" md-search-text=\"$select.search_text\" md-items=\"fixture in get_matches($select.search_text)\" md-item-text=\"fixture.name\"><md-item-template><span md-highlight-text=\"$select.search_text\">{{ fixture.name }}</span></md-item-template></md-autocomplete>every<md-input-container><label>frequency</label><input any-number type=\"number\" name=\"frequency\" ng-model=\"fixture.selected.frequency\"></md-input-container>, or so, days.</div><!--div(layout=\"row\")--><!--  {{ fixture.selected }}--><div layout=\"row\" layout-align=\"end center\" class=\"md-actions\"><md-button ng-click=\"create_from_fixture()\">Make It So</md-button></div>");
+    "<div layout=\"column\" layout-align=\"start start\" layout-gt-sm=\"row\" layout-align-gt-sm=\"start center\" flex class=\"md-headline\">I want to<md-autocomplete md-floating-label=\"do something...\" md-autoselect=\"true\" md-select-on-match=\"false\" md-no-cache=\"true\" md-delay=\"150\" md-selected-item=\"fixture.selected\" md-search-text=\"$select.search_text\" md-items=\"fixture in get_matches($select.search_text)\" md-item-text=\"fixture.name\"><md-item-template><span md-highlight-text=\"$select.search_text\">{{ fixture.name }}</span></md-item-template></md-autocomplete>every<md-input-container><label>frequency</label><input any-number type=\"number\" name=\"frequency\" ng-model=\"fixture.selected.frequency\"></md-input-container>or so, days.</div><!--div(layout=\"row\")--><!--  {{ fixture.selected }}--><div layout=\"row\" layout-align=\"end center\" class=\"md-actions\"><md-button ng-click=\"create_from_fixture()\">Make It So</md-button></div>");
 }]);
 
 angular.module("login.jade", []).run(["$templateCache", function($templateCache) {
@@ -27,10 +32,10 @@ angular.module("panel.jade", []).run(["$templateCache", function($templateCache)
 
 angular.module("sidenav.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("sidenav.jade",
-    "<md-sidenav md-component-id=\"menu\" md-is-locked-open=\"$mdMedia('gt-sm')\" class=\"md-sidenav-left md-whiteframe-z2\"><md-toolbar><div class=\"md-toolbar-tools\"><h1>Menu</h1><span flex></span><md-button ng-click=\"toggle_sidenav()\" class=\"md-icon-button\"><md-icon aria-label=\"Close Menu\" md-font-icon=\"material-icons\">close</md-icon></md-button></div></md-toolbar><md-content layout-padding><md-button ng-click=\"toggle_sidenav()\">Close Menu</md-button><md-divider></md-divider><md-button ng-if=\"config.user\" ng-click=\"logout()\">Logout</md-button></md-content></md-sidenav>");
+    "<md-sidenav layout-fill md-component-id=\"menu\" md-is-locked-open=\"$mdMedia('gt-md')\" class=\"md-sidenav-left md-whiteframe-z2\"><md-toolbar><div class=\"md-toolbar-tools\"><h1>Menu</h1><span flex></span><md-button hide-gt-md ng-click=\"toggle_sidenav()\" class=\"md-icon-button\"><md-icon aria-label=\"Close Menu\" md-font-icon=\"material-icons\">close</md-icon></md-button></div></md-toolbar><md-content layout=\"column\" layout-padding flex><md-button hide-gt-md ng-click=\"toggle_sidenav()\">Close Menu</md-button><md-divider></md-divider><md-button ng-if=\"config.user\" ng-click=\"logout()\">Logout</md-button></md-content></md-sidenav>");
 }]);
 
 angular.module("tasks.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("tasks.jade",
-    "<div><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item ng-repeat=\"task in tasks\" ng-click=\"update_time()\" class=\"md-2-line\"><any-task task=\"task\"></any-task></md-list-item></md-list></div>");
+    "<div ng-controller=\"AnyTasksController\"><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item any-task ng-repeat=\"task in tasks\" ng-click=\";\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
 }]);
