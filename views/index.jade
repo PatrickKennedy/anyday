@@ -1,28 +1,30 @@
 extends layout
 
 block content
-  md-toolbar(layout="row")
+  md-toolbar.md-whiteframe-z1(layout="row")
     .md-toolbar-tools
       md-button.md-icon-button(ng-click="toggle_sidenav()")
         md-icon(aria-label="Menu", md-font-icon="material-icons") menu
       h1= title
 
-  any-sidenav
+  section(layout="row" flex)
+    any-sidenav
 
-  #content(layout="column" flex)
-    md-content.md-padding(layout="column" flex)
-      md-card
-        md-card-content
-          unless user
-            any-login-form
-
-          if user
-            p.md-headline Hi, you can call me
-              span.md-title  #{user.email}
-
-            any-fixtures-list
-
-      if user
+    #content(layout="column" layout-fill flex)
+      md-content.md-padding(layout="column" flex)
         md-card
           md-card-content
-            any-tasks-list
+            unless user
+              any-login-form
+
+            if user
+              p.md-headline Hi,
+              p.md-headline you can call me
+                span.md-title  #{user.email}.
+
+              any-fixtures-list
+
+        if user
+          md-card
+            md-card-content
+              any-tasks-list
