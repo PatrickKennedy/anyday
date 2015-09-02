@@ -37,5 +37,5 @@ angular.module("sidenav.jade", []).run(["$templateCache", function($templateCach
 
 angular.module("tasks.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("tasks.jade",
-    "<div ng-controller=\"AnyTasksController\"><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item any-task ng-repeat=\"task in tasks\" ng-click=\";\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
+    "<div ng-controller=\"AnyTasksController\"><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item any-task ng-repeat=\"task in tasks\" ng-click=\"show_bottom_sheet($event, task)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
 }]);

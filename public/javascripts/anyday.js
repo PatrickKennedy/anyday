@@ -150,8 +150,8 @@
    */
   angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
+      '$scope', '$mdBottomSheet', 'AnyAPI',
+      function($scope, $mdBottomSheet, api) {
         $scope.tasks = [];
         api.tasks().success(function(result) {
           $scope.tasks = result;
@@ -168,6 +168,40 @@
             task.when = old_when;
             console.log(error);
           });
+        }
+
+        $scope.delete_task = function (task){
+          api.delete(task).success(function(result) {
+            $scope.tasks.splice($scope.tasks.indexOf(task), 1);
+            console.log(result);
+          }).error(function(error){
+            console.log(error);
+          });
+        }
+
+        $scope.show_bottom_sheet = function($event, task) {
+          $mdBottomSheet.show({
+            preserveScope: true,
+            locals: { options: {update_time: $scope.update_time, delete_task: $scope.delete_task} },
+            templateUrl: 'any-task-bottom-sheet.jade',
+            controller: 'AnyTasksBottomSheetController',
+            targetEvent: $event,
+          }).then(function(clicked_item){
+            clicked_item.fn(task);
+          })
+        }
+      }
+    ])
+    .controller('AnyTasksBottomSheetController', [
+      '$scope', '$mdBottomSheet', 'options',
+      function($scope, $mdBottomSheet, options) {
+        $scope.items = [
+          { name: 'Complete', icon: 'check', fn: options.update_time },
+          { name: 'Delete', icon: 'delete', fn: options.delete_task },
+        ];
+        $scope.menu_click = function($index) {
+          var clicked_item = $scope.items[$index];
+          $mdBottomSheet.hide(clicked_item);
         }
       }
     ])

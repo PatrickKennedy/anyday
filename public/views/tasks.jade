@@ -1,7 +1,7 @@
 div(ng-controller="AnyTasksController")
   md-list
     md-subheader.md-no-sticky Tasks
-    md-list-item.md-2-line(any-task ng-repeat="task in tasks" ng-click=";")
+    md-list-item.md-2-line(any-task ng-repeat="task in tasks" ng-click="show_bottom_sheet($event, task)")
       .md-list-item-text
         h3 {{ task.name }}
         h4 {{ task.when.relative() }}
