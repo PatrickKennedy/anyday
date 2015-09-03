@@ -69,7 +69,7 @@
    * AnyLogin module
    * Contains all logic related to the login functionality
    */
-  angular.module('any.login', ['any.api', 'anyday.templates', 'login.jade'])
+  angular.module('any.login', ['login.jade'])
     .controller('AnyLoginFormController', [
       '$scope', '$location', 'AnyAPI',
       function($scope, $location, api) {
@@ -120,7 +120,7 @@
    * AnySidenav module
    * Contains the display logic for the task details pane
    */
-  angular.module('any.sidenav', ['any.api', 'anyday.templates', 'sidenav.jade'])
+  angular.module('any.sidenav', ['sidenav.jade'])
     .controller('AnySidenavController', [
       '$scope', 'AnyAPI',
       function ($scope, api) {
@@ -148,7 +148,7 @@
    * AnyTasks module
    * Contains the display logic for the task lists
    */
-  angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade', 'any-task.jade'])
+  angular.module('any.tasks', ['tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
       '$scope', '$mdBottomSheet', 'AnyAPI',
       function($scope, $mdBottomSheet, api) {
@@ -230,7 +230,7 @@
    * AnyFixtures module
    * Contains the display logic for the fixture list
    */
-  angular.module('any.fixtures', ['any.api', 'anyday.templates', 'fixtures.jade'])
+  angular.module('any.fixtures', ['fixtures.jade'])
     .controller('AnyFixturesController', [
       '$scope', 'AnyAPI',
       function($scope, api) {
@@ -340,7 +340,7 @@
    * AnyDetails module
    * Contains the display logic for the task details pane
    */
-  angular.module('any.details', ['any.api', 'anyday.templates', 'details.jade'])
+  angular.module('any.details', ['details.jade'])
     .controller('AnydetailsController', [
 
     ])
@@ -364,7 +364,7 @@
     'anyday',
     [
      'any.api', 'any.config', 'any.login', 'any.fixtures', 'any.tasks', 'any.sidenav',
-     'ngMaterial',
+     'anyday.templates', 'ngMaterial',
     ]
   )
     .controller('AnydayController', [
