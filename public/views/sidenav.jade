@@ -1,0 +1,12 @@
+md-sidenav.md-sidenav-left.md-whiteframe-z2(layout-fill md-component-id="menu" md-is-locked-open="$mdMedia('gt-md')")
+  md-toolbar
+    .md-toolbar-tools
+      h1 Menu
+      span(flex)
+      md-button.md-icon-button(hide-gt-md ng-click="toggle_sidenav()")
+        md-icon(aria-label="Close Menu", md-font-icon="material-icons") close
+
+  md-content(layout="column" layout-padding flex)
+    md-button(hide-gt-md ng-click="toggle_sidenav()") Close Menu
+    md-divider
+    md-button(ng-if="config.user" ng-click="logout()") Logout

@@ -39,7 +39,7 @@ module.exports = function(app) {
         from: config.email.sender,
         to: recipient,
         subject: 'Hello from Anyday',
-        html: 'Hello, This is not a plain-text email, I wanted to test some spicy Mailgun sauce in Anyday! <a href="http://localhost:3000/?uid='+ uidToSend +'&token='+ tokenToSend +'">Click here to login!</a>'
+        html: 'Hello! Here is your token:'+ tokenToSend +'. Or click here to login: <a href="http://anyday.dokku.dysio.de/?uid='+ uidToSend +'&token='+ tokenToSend +'">Click here to login!</a>'
       }
 
       mailgun.messages().send(data, function (err, body) {
@@ -50,7 +50,7 @@ module.exports = function(app) {
         }
         callback(null);
       });
-    }
+    }, { ttl: 60*60*24*30 }
   );
 
   app.use(passwordless.sessionSupport());
@@ -58,7 +58,7 @@ module.exports = function(app) {
 
   // For every request: provide user data to the view
 	app.use(function(req, res, next) {
-    
+
 		if(app._rdbConn && req.user) {
       User.get(req.user, app._rdbConn, function(err, user){
         if (err) return next(err);

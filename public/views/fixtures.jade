@@ -1,20 +1,29 @@
-div
-  | and, I want to
-  ui-select(tagging="$scope.transform_tag", ng-model="fixture.selected" title="")
-    ui-select-match(placeholder="do something...")
-      {{ $select.selected.name }}
-
-    ui-select-choices(repeat="fixture in task_fixtures | filter: $select.search track by fixture.id")
-      div(ng-if="fixture.isTag" ng-bind-html="fixture.name +' '+ $select.taggingLabel | highlight: $select.search")
-      div(ng-if="!fixture.isTag" ng-bind-html="fixture.name | highlight: $select.search")
-      small
+#fixtures(layout="column" ng-controller="AnyFixturesController as vm")
+  .md-headline(
+    layout="column" layout-align="start start"
+    layout-gt-sm="row" layout-align-gt-sm="start center"
+    flex
+  )
+    | I want to
+    md-autocomplete(
+      md-floating-label="do something..."
+      md-autoselect="true"
+      md-select-on-match="false"
+      md-no-cache="true"
+      md-delay="150"
+      md-selected-item="vm.fixture"
+      md-search-text="vm.search_text"
+      md-items="fixture in vm.get_matches(vm.search_text)"
+      md-item-text="fixture.name"
+    )
+      md-item-template
+        span(md-highlight-text="vm.search_text") {{ fixture.name }}
+    | every
+    md-input-container
+      label
         | frequency
-        {{ fixture.frequency }}
+      input(any-number type="number" name="frequency" ng-model="vm.fixture.frequency")
+    | or so, days.
 
-  // select(name="action" ng-model="action")
-  //  option(ng-repeat="fixture in task_fixtures" value="{{ fixture.id }}") {{ fixture.name }}
-  | every
-  input(any-number type="number" name="frequency" ng-model="fixture.selected.frequency")
-  |, or so, days.
-  {{ fixture.selected }}
-  {{ transform_tag }}
+  .md-actions(layout="row" layout-align="end center")
+    md-button(ng-click="vm.create_from_fixture()") Make It So

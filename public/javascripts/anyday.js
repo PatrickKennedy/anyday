@@ -5,7 +5,7 @@
    */
   angular.module('any.config', [])
     .provider('AnyConfig', function () {
-      var config = Object.extend({
+      var config = Object.extended({
          user: null,
       });
       return {
@@ -55,7 +55,11 @@
        tokenlogin: function(email, token) {
         var url = prefix+'/tokenlogin/';
         return $http.get(url, {params: {email: email, token: token}});
-       }
+       },
+       logout: function() {
+        var url = prefix+'/logout/';
+        return $http.get(url);
+       },
       };
      }
     ])
@@ -65,7 +69,7 @@
    * AnyLogin module
    * Contains all logic related to the login functionality
    */
-  angular.module('any.login', ['any.api', 'anyday.templates', 'login.jade'])
+  angular.module('any.login', ['login.jade'])
     .controller('AnyLoginFormController', [
       '$scope', '$location', 'AnyAPI',
       function($scope, $location, api) {
@@ -106,6 +110,35 @@
       function () {
         return {
           templateUrl: 'login.jade',
+          controller: 'AnyLoginFormController',
+        }
+      }
+    ])
+  ;
+
+  /*
+   * AnySidenav module
+   * Contains the display logic for the task details pane
+   */
+  angular.module('any.sidenav', ['sidenav.jade'])
+    .controller('AnySidenavController', [
+      '$scope', 'AnyAPI',
+      function ($scope, api) {
+        $scope.logout = function() {
+          api.logout()
+          .success(function(result) {
+            console.log('logged out : '+ result.result);
+            location.replace('/');
+          });
+        }
+      }
+    ])
+    .directive('anySidenav', [
+      'AnyConfig',
+      function (config) {
+        return {
+          templateUrl: 'sidenav.jade',
+          controller: 'AnySidenavController',
         }
       }
     ])
@@ -115,14 +148,24 @@
    * AnyTasks module
    * Contains the display logic for the task lists
    */
-  angular.module('any.tasks', ['any.api', 'anyday.templates', 'tasks.jade'])
+  angular.module('any.tasks', ['tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
-        $scope.update_time = function (){
-          var task = $scope.tasks[this.$index]
-            , old_when = task.when
-            ;
+      '$scope', '$mdBottomSheet', 'AnyAPI',
+      function($scope, $mdBottomSheet, api) {
+        var vm = this;
+        vm.tasks = [];
+        api.tasks().success(function(result) {
+          vm.tasks = result;
+        }).error(function(error){
+          console.log(error);
+        });
+
+        $scope.$on('any:new-task', function(event, task){
+          vm.tasks.push(task);
+        })
+
+        vm.update_time = function (task){
+          var old_when = task.when;
           task.when = Date.create('now');
           api.update(task).success(function(result) {
             console.log(result);
@@ -130,6 +173,43 @@
             task.when = old_when;
             console.log(error);
           });
+        }
+
+        vm.delete_task = function (task){
+          api.delete(task.id).success(function(result) {
+            if (result.deleted == 1) {
+              vm.tasks.splice(vm.tasks.indexOf(task), 1);
+            }
+            console.log(result);
+          }).error(function(error){
+            console.log(error);
+          });
+        }
+
+        vm.show_bottom_sheet = function($event, task) {
+          $mdBottomSheet.show({
+            locals: { options: {update_time: vm.update_time, delete_task: vm.delete_task} },
+            templateUrl: 'any-task-bottom-sheet.jade',
+            controller: 'AnyTasksBottomSheetController',
+            controllerAs: 'vm',
+            targetEvent: $event,
+          }).then(function(clicked_item){
+            clicked_item.fn(task);
+          })
+        }
+      }
+    ])
+    .controller('AnyTasksBottomSheetController', [
+      '$mdBottomSheet', 'options',
+      function($mdBottomSheet, options) {
+        var vm = this;
+        vm.items = [
+          { name: 'Complete', icon: 'check', fn: options.update_time },
+          { name: 'Delete', icon: 'delete', fn: options.delete_task },
+        ];
+        vm.menu_click = function($index) {
+          var clicked_item = vm.items[$index];
+          $mdBottomSheet.hide(clicked_item);
         }
       }
     ])
@@ -144,12 +224,8 @@
     .directive('anyTask', [
       function () {
         return {
-          scope: {
-            task: '=',
-          },
           //TODO: Decrease .relative's granularity
           // see: http://sugarjs.com/api/Date/relative
-          template: '{{ task.name }} - {{ task.when.relative() }}',
           link: function(scope, element, attrs) {
             scope.task.when = Date.create(scope.task.when);
           }
@@ -159,73 +235,58 @@
   ;
 
   /*
-   * AnyPanel module
-   * Contains any panel related logic
-   * Fixtures and Details panes will be displayed here
-   */
-  angular.module('any.panel', ['anyday.templates', 'panel.jade'])
-    .controller('AnyPanelController', [
-
-    ])
-    .directive('anyPanel', [
-      function () {
-        return {
-          transclude: true,
-          templateUrl: 'panel.jade',
-        }
-      }
-    ])
-  ;
-
-  /*
    * AnyFixtures module
    * Contains the display logic for the fixture list
    */
-  angular.module('any.fixtures', ['any.api', 'anyday.templates', 'fixtures.jade'])
+  angular.module('any.fixtures', ['fixtures.jade'])
     .controller('AnyFixturesController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
-        $scope.task_fixtures = []
-        $scope.fixture = {}
+      '$rootScope', 'AnyAPI',
+      function($rootScope, api) {
+        var vm = this;
+        vm.task_fixtures = [];
+        vm.fixture;
+        vm.search_text = '';
         api.fixtures().success(function(result) {
-          $scope.task_fixtures = result;
+          vm.task_fixtures = result;
         }).error(function(error){
           console.log(error);
         });
 
         function _create_task(task) {
           api.create(task).success(function(result) {
-            $scope.tasks.push(task);
+            $rootScope.$broadcast('any:new-task', result.changes[0].new_val)
             console.log(result);
           }).error(function(error){
             console.log(error);
           });
         }
 
-        $scope.transform_tag = function(new_tag){
-          console.log("transforming tag")
-          return {
-            id: undefined,
-            name: new_tag,
-            frequency: 1,
-          };
+        vm.get_matches = function(search_text) {
+          query = angular.lowercase(search_text);
+          var results = vm.task_fixtures.filter(function(fixture) {
+            return (fixture.name.toLowerCase().indexOf(query) === 0);
+          });
+          if (results.length != 1) {
+            results.unshift({
+              id: '',
+              name: search_text,
+              frequency: 1
+            });
+          }
+
+          return results;
         }
 
-        $scope.create_from_fixture = function (){
-          var fixture = $scope.task_fixtures[this.$index]
-            , task = angular.copy(fixture)
-            ;
+        vm.create_from_fixture = function (){
+          var task = angular.copy(vm.fixture);
+
+          // return if the task hasn't been generated
+          if (task === null)
+            return;
 
           delete task.id;
           task.when = Date.create('now');
           _create_task(task);
-        }
-
-        $scope.create_custom = function (){
-          _create_task({
-            name: $scope.custom_name,
-            when: Date.create('now'),
-          });
         }
       }
     ])
@@ -234,16 +295,7 @@
         return {
           templateUrl: 'fixtures.jade',
           controller: 'AnyFixturesController',
-        }
-      }
-    ])
-    .directive('anyFixture', [
-      function () {
-        return {
-          scope: {
-            fixture: '=',
-          },
-          template: '{{ fixture.name }}',
+          controllerAs: 'vm',
         }
       }
     ])
@@ -268,7 +320,7 @@
    * AnyDetails module
    * Contains the display logic for the task details pane
    */
-  angular.module('any.details', ['any.api', 'anyday.templates', 'details.jade'])
+  angular.module('any.details', ['details.jade'])
     .controller('AnydetailsController', [
 
     ])
@@ -291,13 +343,17 @@
   angular.module(
     'anyday',
     [
-     'any.api', 'any.login', 'any.tasks', 'any.fixtures', 'any.details',
-     'ngSanitize', 'ui.select'
+     'any.api', 'any.config', 'any.login', 'any.fixtures', 'any.tasks', 'any.sidenav',
+     'anyday.templates', 'ngMaterial',
     ]
   )
     .controller('AnydayController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
+      '$scope', '$mdSidenav', 'AnyAPI', 'AnyConfig',
+      function($scope, $mdSidenav, api, config) {
+        $scope.config = config;
+        $scope.toggle_sidenav = function() {
+          $mdSidenav('menu').toggle();
+        };
       //$scope.tasks = [
       //  {
       //    name: "Shower",
@@ -315,13 +371,6 @@
       //}).error(function(error){
       //  console.log(error);
       //});
-
-      $scope.tasks = []
-      api.tasks().success(function(result) {
-        $scope.tasks = result;
-      }).error(function(error){
-        console.log(error);
-      });
     }])
   ;
 }(angular));
