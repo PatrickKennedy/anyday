@@ -2,7 +2,7 @@ angular.module('anyday.templates', ['any-task-bottom-sheet.jade', 'any-task.jade
 
 angular.module("any-task-bottom-sheet.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("any-task-bottom-sheet.jade",
-    "<md-bottom-sheet layout=\"row\" controller=\"AnyTasksBottomSheetController\" class=\"md-grid\"><md-list flex layout=\"row\" layout-align=\"center center\"><md-list-item ng-repeat=\"item in items\"><md-button ng-click=\"menu_click($index)\" class=\"md-grid-item-content\"><md-icon md-font-icon=\"material-icons\">{{ item.icon }}</md-icon><div class=\"md-grid-text\">{{ item.name }}</div></md-button></md-list-item></md-list></md-bottom-sheet>");
+    "<md-bottom-sheet layout=\"row\" controller=\"AnyTasksBottomSheetController as vm\" class=\"md-grid\"><md-list flex layout=\"row\" layout-align=\"center center\"><md-list-item ng-repeat=\"item in vm.items\"><md-button ng-click=\"vm.menu_click($index)\" class=\"md-grid-item-content\"><md-icon md-font-icon=\"material-icons\">{{ item.icon }}</md-icon><div class=\"md-grid-text\">{{ item.name }}</div></md-button></md-list-item></md-list></md-bottom-sheet>");
 }]);
 
 angular.module("any-task.jade", []).run(["$templateCache", function($templateCache) {
@@ -17,7 +17,7 @@ angular.module("details.jade", []).run(["$templateCache", function($templateCach
 
 angular.module("fixtures.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("fixtures.jade",
-    "<div layout=\"column\" layout-align=\"start start\" layout-gt-sm=\"row\" layout-align-gt-sm=\"start center\" flex class=\"md-headline\">I want to<md-autocomplete md-floating-label=\"do something...\" md-autoselect=\"true\" md-select-on-match=\"false\" md-no-cache=\"true\" md-delay=\"150\" md-selected-item=\"fixture.selected\" md-search-text=\"$select.search_text\" md-items=\"fixture in get_matches($select.search_text)\" md-item-text=\"fixture.name\"><md-item-template><span md-highlight-text=\"$select.search_text\">{{ fixture.name }}</span></md-item-template></md-autocomplete>every<md-input-container><label>frequency</label><input any-number type=\"number\" name=\"frequency\" ng-model=\"fixture.selected.frequency\"></md-input-container>or so, days.</div><!--div(layout=\"row\")--><!--  {{ fixture.selected }}--><div layout=\"row\" layout-align=\"end center\" class=\"md-actions\"><md-button ng-click=\"create_from_fixture()\">Make It So</md-button></div>");
+    "<div id=\"fixtures\" layout=\"column\" ng-controller=\"AnyFixturesController as vm\"><div layout=\"column\" layout-align=\"start start\" layout-gt-sm=\"row\" layout-align-gt-sm=\"start center\" flex class=\"md-headline\">I want to<md-autocomplete md-floating-label=\"do something...\" md-autoselect=\"true\" md-select-on-match=\"false\" md-no-cache=\"true\" md-delay=\"150\" md-selected-item=\"vm.fixture\" md-search-text=\"vm.search_text\" md-items=\"fixture in vm.get_matches(vm.search_text)\" md-item-text=\"fixture.name\"><md-item-template><span md-highlight-text=\"vm.search_text\">{{ fixture.name }}</span></md-item-template></md-autocomplete>every<md-input-container><label>frequency</label><input any-number type=\"number\" name=\"frequency\" ng-model=\"vm.fixture.frequency\"></md-input-container>or so, days.</div><div layout=\"row\" layout-align=\"end center\" class=\"md-actions\"><md-button ng-click=\"vm.create_from_fixture()\">Make It So</md-button></div></div>");
 }]);
 
 angular.module("login.jade", []).run(["$templateCache", function($templateCache) {
@@ -37,5 +37,5 @@ angular.module("sidenav.jade", []).run(["$templateCache", function($templateCach
 
 angular.module("tasks.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("tasks.jade",
-    "<div ng-controller=\"AnyTasksController\"><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item any-task ng-repeat=\"task in tasks\" ng-click=\"show_bottom_sheet($event, task)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
+    "<div id=\"tasks\" ng-controller=\"AnyTasksController as vm\"><md-list><md-subheader class=\"md-no-sticky\">Tasks</md-subheader><md-list-item any-task ng-repeat=\"task in vm.tasks\" ng-click=\"vm.show_bottom_sheet($event, task)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"vm.update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
 }]);
