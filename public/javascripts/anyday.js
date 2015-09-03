@@ -152,14 +152,19 @@
     .controller('AnyTasksController', [
       '$scope', '$mdBottomSheet', 'AnyAPI',
       function($scope, $mdBottomSheet, api) {
-        $scope.tasks = [];
+        var vm = this;
+        vm.tasks = [];
         api.tasks().success(function(result) {
-          $scope.tasks = result;
+          vm.tasks = result;
         }).error(function(error){
           console.log(error);
         });
 
-        $scope.update_time = function (task){
+        $scope.$on('any:new-task', function(event, task){
+          vm.tasks.push(task);
+        })
+
+        vm.update_time = function (task){
           var old_when = task.when;
           task.when = Date.create('now');
           api.update(task).success(function(result) {
@@ -170,21 +175,23 @@
           });
         }
 
-        $scope.delete_task = function (task){
-          api.delete(task).success(function(result) {
-            $scope.tasks.splice($scope.tasks.indexOf(task), 1);
+        vm.delete_task = function (task){
+          api.delete(task.id).success(function(result) {
+            if (result.deleted == 1) {
+              vm.tasks.splice(vm.tasks.indexOf(task), 1);
+            }
             console.log(result);
           }).error(function(error){
             console.log(error);
           });
         }
 
-        $scope.show_bottom_sheet = function($event, task) {
+        vm.show_bottom_sheet = function($event, task) {
           $mdBottomSheet.show({
-            preserveScope: true,
-            locals: { options: {update_time: $scope.update_time, delete_task: $scope.delete_task} },
+            locals: { options: {update_time: vm.update_time, delete_task: vm.delete_task} },
             templateUrl: 'any-task-bottom-sheet.jade',
             controller: 'AnyTasksBottomSheetController',
+            controllerAs: 'vm',
             targetEvent: $event,
           }).then(function(clicked_item){
             clicked_item.fn(task);
@@ -193,14 +200,15 @@
       }
     ])
     .controller('AnyTasksBottomSheetController', [
-      '$scope', '$mdBottomSheet', 'options',
-      function($scope, $mdBottomSheet, options) {
-        $scope.items = [
+      '$mdBottomSheet', 'options',
+      function($mdBottomSheet, options) {
+        var vm = this;
+        vm.items = [
           { name: 'Complete', icon: 'check', fn: options.update_time },
           { name: 'Delete', icon: 'delete', fn: options.delete_task },
         ];
-        $scope.menu_click = function($index) {
-          var clicked_item = $scope.items[$index];
+        vm.menu_click = function($index) {
+          var clicked_item = vm.items[$index];
           $mdBottomSheet.hide(clicked_item);
         }
       }
@@ -232,31 +240,30 @@
    */
   angular.module('any.fixtures', ['fixtures.jade'])
     .controller('AnyFixturesController', [
-      '$scope', 'AnyAPI',
-      function($scope, api) {
-        $scope.task_fixtures = []
-        $scope.fixture = {}
-        $scope.$select = {
-
-        }
+      '$rootScope', 'AnyAPI',
+      function($rootScope, api) {
+        var vm = this;
+        vm.task_fixtures = [];
+        vm.fixture;
+        vm.search_text = '';
         api.fixtures().success(function(result) {
-          $scope.task_fixtures = result;
+          vm.task_fixtures = result;
         }).error(function(error){
           console.log(error);
         });
 
         function _create_task(task) {
           api.create(task).success(function(result) {
-            $scope.tasks.push(task);
+            $rootScope.$broadcast('any:new-task', result.changes[0].new_val)
             console.log(result);
           }).error(function(error){
             console.log(error);
           });
         }
 
-        $scope.get_matches = function(search_text) {
+        vm.get_matches = function(search_text) {
           query = angular.lowercase(search_text);
-          var results = $scope.task_fixtures.filter(function(fixture) {
+          var results = vm.task_fixtures.filter(function(fixture) {
             return (fixture.name.toLowerCase().indexOf(query) === 0);
           });
           if (results.length != 1) {
@@ -270,19 +277,8 @@
           return results;
         }
 
-        $scope.transform_tag = function(new_tag) {
-          console.log("transforming tag")
-          return {
-            id: undefined,
-            name: new_tag,
-            frequency: 1,
-          };
-        }
-
-        $scope.create_from_fixture = function (){
-          var fixture = $scope.fixture.selected
-            , task = angular.copy(fixture)
-            ;
+        vm.create_from_fixture = function (){
+          var task = angular.copy(vm.fixture);
 
           // return if the task hasn't been generated
           if (task === null)
@@ -292,13 +288,6 @@
           task.when = Date.create('now');
           _create_task(task);
         }
-
-        $scope.create_custom = function (){
-          _create_task({
-            name: $scope.custom_name,
-            when: Date.create('now'),
-          });
-        }
       }
     ])
     .directive('anyFixturesList', [
@@ -306,16 +295,7 @@
         return {
           templateUrl: 'fixtures.jade',
           controller: 'AnyFixturesController',
-        }
-      }
-    ])
-    .directive('anyFixture', [
-      function () {
-        return {
-          scope: {
-            fixture: '=',
-          },
-          template: '{{ fixture.name }}',
+          controllerAs: 'vm',
         }
       }
     ])
