@@ -49,6 +49,7 @@ module.exports = function(grunt) {
     "node-inspector": {
       dev: {
         options: {
+          'web-port': 5000,
           'save-live-edit': true,
           'no-preload': true,
           'hidden': ['node_modules'],

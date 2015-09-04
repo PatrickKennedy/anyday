@@ -1,7 +1,29 @@
-div
-  ul
-    li
-      input(type="text" name="custom_name" ng-model="custom_name" ng-keyup="$event.keyCode == 13 && create_custom()")
-    li(ng-repeat="fixture in task_fixtures")
-      any-fixture(fixture="fixture" ng-click="create_from_fixture()")
+#fixtures(layout="column" ng-controller="AnyFixturesController as vm")
+  .md-headline(
+    layout="column" layout-align="start start"
+    layout-gt-sm="row" layout-align-gt-sm="start center"
+    flex
+  )
+    | I want to
+    md-autocomplete(
+      md-floating-label="do something..."
+      md-autoselect="true"
+      md-select-on-match="false"
+      md-no-cache="true"
+      md-delay="150"
+      md-selected-item="vm.fixture"
+      md-search-text="vm.search_text"
+      md-items="fixture in vm.get_matches(vm.search_text)"
+      md-item-text="fixture.name"
+    )
+      md-item-template
+        span(md-highlight-text="vm.search_text") {{ fixture.name }}
+    | every
+    md-input-container
+      label
+        | frequency
+      input(any-number type="number" name="frequency" ng-model="vm.fixture.frequency")
+    | or so, days.
 
+  .md-actions(layout="row" layout-align="end center")
+    md-button(ng-click="vm.create_from_fixture()") Make It So

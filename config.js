@@ -12,9 +12,13 @@ try {
   }
 }
 
-config = Object.merge(config, local);
+config = Object.merge(config, local, true);
 
 config.rethinkdb.host = process.env.RETHINKDB_HOST || config.rethinkdb.host
 config.rethinkdb.port = process.env.RETHINKDB_PORT || config.rethinkdb.port
+
+config.email.api_key = process.env.EMAIL_API_KEY || config.email.api_key
+config.email.domain = process.env.EMAIL_DOMAIN || config.email.domain
+config.email.sender = process.env.EMAIL_SENDER || "noreply@"+config.email.domain
 
 module.exports = config;
