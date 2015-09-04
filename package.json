@@ -1,6 +1,6 @@
 {
   "name": "anyday",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Date Agnostic To-Do List",
   "main": "./bin/www",
   "author": "Patrick Kennedy <p@trickkennedy.com>",
