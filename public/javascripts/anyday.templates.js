@@ -7,7 +7,7 @@ angular.module("any-task-bottom-sheet.jade", []).run(["$templateCache", function
 
 angular.module("any-task.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("any-task.jade",
-    "<md-list-item ng-click=\"show_bottom_sheet($event)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"update_time()\" class=\"md-secondary\">check</md-icon></md-list-item>");
+    "<div layout=\"column\" class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-divider></md-divider>");
 }]);
 
 angular.module("details.jade", []).run(["$templateCache", function($templateCache) {
