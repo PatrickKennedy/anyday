@@ -245,7 +245,7 @@
         var vm = this;
         vm.task_fixtures = [];
         vm.fixture;
-        vm.search_text = '';
+        vm.search_text = null;
         api.fixtures().success(function(result) {
           vm.task_fixtures = result;
         }).error(function(error){
@@ -262,16 +262,26 @@
         }
 
         vm.get_matches = function(search_text) {
+          var query
+              , results
+              , custom_result
+              ;
+
+          search_text = search_text.trim();
           query = angular.lowercase(search_text);
-          var results = vm.task_fixtures.filter(function(fixture) {
+
+          results = query ? vm.task_fixtures.filter(function(fixture) {
             return (fixture.name.toLowerCase().indexOf(query) === 0);
-          });
-          if (results.length != 1) {
-            results.unshift({
+          }) : vm.task_fixtures;
+
+          if (search_text && results.length <= 0) {
+            custom_result = {
               id: '',
               name: search_text,
               frequency: 1
-            });
+            };
+            results.unshift(custom_result);
+            vm.fixture = custom_result;
           }
 
           return results;

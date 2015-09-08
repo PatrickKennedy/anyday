@@ -8,11 +8,12 @@
     md-autocomplete(
       md-floating-label="do something..."
       md-autoselect="true"
-      md-select-on-match="false"
-      md-no-cache="true"
-      md-delay="150"
+      md-select-on-match="false" // Creates a jittery experience; we set the result manually for now
+      md-no-cache="true" // For now we're querying local data so we don't need to cache
+      md-delay="150" // 150 seems to be the right delay to feel responsive and avoid jitter
       md-selected-item="vm.fixture"
       md-search-text="vm.search_text"
+      md-min-length="0" // Required to enable a dropdown with all the items
       md-items="fixture in vm.get_matches(vm.search_text)"
       md-item-text="fixture.name"
     )
