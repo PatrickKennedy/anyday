@@ -300,6 +300,13 @@
         }
       }
     ])
+    .filter('default', function () {
+      return function (item, def) {
+        if (item !== undefined)
+          return item;
+        return def;
+      }
+    })
     .directive('anyFixturesList', [
       function () {
         return {
