@@ -5,7 +5,7 @@
       "delete_missing": "true"
     },
     {
-      "id": "shower",
+      "id": "take-shower",
       "name": "Shower",
       "frequency": "1"
     },
@@ -18,6 +18,66 @@
       "id": "wash-windows",
       "name": "Wash Windows",
       "frequency": "7"
+    },
+    {
+      "id": "clean-oven",
+      "name": "Clean Oven",
+      "frequency": "180"
+    },
+    {
+      "id": "water-plants",
+      "name": "Water Plants",
+      "frequency": "2"
+    },
+    {
+      "id": "vacuum-house",
+      "name": "Vacuum House",
+      "frequency": "7"
+    },
+    {
+      "id": "flip-matress",
+      "name": "Flip Matress",
+      "frequency": "180"
+    },
+    {
+      "id": "wash-linens",
+      "name": "Wash Linens",
+      "frequency": "14"
+    },
+    {
+      "id": "ride-bike",
+      "name": "Ride Bike",
+      "frequency": "4"
+    },
+    {
+      "id": "take-walk",
+      "name": "Take Walk",
+      "frequency": "2"
+    },
+    {
+      "id": "call-parents",
+      "name": "Call Parents",
+      "frequency": "14"
+    },
+    {
+      "id": "meditate",
+      "name": "Meditate",
+      "frequency": "2"
+    },
+    {
+      "id": "do-yoga",
+      "name": "do-yoga",
+      "frequency": "7"
+    },
+    {
+      "id": "workout",
+      "name": "workout",
+      "frequency": "3"
+    },
+    {
+      "id": "change-oil",
+      "name": "Change Oil",
+      "frequency": "120"
     },
     {
       "id": "clean-disposal",
