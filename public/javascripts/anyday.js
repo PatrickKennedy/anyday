@@ -155,22 +155,46 @@
         var vm = this;
         vm.tasks = [];
         api.tasks().success(function(result) {
-          vm.tasks = result;
+          vm.tasks = prep_result(result);
         }).error(function(error){
           console.log(error);
         });
+
+        function prep_result(tasks) {
+          tasks = tasks.map(function(task) {
+            task.when = Date.create(task.when)
+            task.
+          })
+        }
+
+        function format_tasks(tasks) {
+          tasks.sort(function(a, b) {
+            a_delta = Date.create(a.when)
+          })
+        }
 
         $scope.$on('any:new-task', function(event, task){
           vm.tasks.push(task);
         })
 
-        vm.update_time = function (task){
-          var old_when = task.when;
-          task.when = Date.create('now');
+        vm.update_time = function (task, past){
+          var old_task = Object.clone(task, true);
+
+          if (past)
+            task.when = Date.create(past + 'days ago');
+
+          delta_days = task.when.hoursAgo() / 24
+
+          if (!past)
+            task.when = Date.create('now');
+
+          task.frequency = ((task.frequency + delta_days)/2).round(2)
+
+
           api.update(task).success(function(result) {
             console.log(result);
           }).error(function(error){
-            task.when = old_when;
+            task = old_task;
             console.log(error);
           });
         }

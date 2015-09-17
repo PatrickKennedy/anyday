@@ -1,7 +1,9 @@
 div(id="tasks" ng-controller="AnyTasksController as vm")
   md-list
-    md-list-item.md-2-line(any-task ng-repeat="task in vm.tasks" ng-click="vm.show_bottom_sheet($event, task)")
+    md-list-item.md-2-line(any-task ng-repeat="task in vm.tasks | order" ng-click="vm.show_bottom_sheet($event, task)")
       .md-list-item-text
         h3 {{ task.name }}
-        h4 {{ task.when.relative() }}
-      md-icon.md-secondary(aria-label="Update Time", md-font-icon="material-icons" ng-click="vm.update_time(task)") check
+        div(layout="row")
+          h4 {{ task.when.relative() }}
+          h4 | every {{ task.frequency }} days
+      md-icon.md-secondary(aria-label="Update Time", md-font-icon="material-icons" ng-click="vm.update_time(task, 5)") check

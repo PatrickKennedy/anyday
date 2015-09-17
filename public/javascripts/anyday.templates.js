@@ -37,5 +37,5 @@ angular.module("sidenav.jade", []).run(["$templateCache", function($templateCach
 
 angular.module("tasks.jade", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("tasks.jade",
-    "<div id=\"tasks\" ng-controller=\"AnyTasksController as vm\"><md-list><md-list-item any-task ng-repeat=\"task in vm.tasks\" ng-click=\"vm.show_bottom_sheet($event, task)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><h4>{{ task.when.relative() }}</h4></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"vm.update_time(task)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
+    "<div id=\"tasks\" ng-controller=\"AnyTasksController as vm\"><md-list><md-list-item any-task ng-repeat=\"task in vm.tasks | order\" ng-click=\"vm.show_bottom_sheet($event, task)\" class=\"md-2-line\"><div class=\"md-list-item-text\"><h3>{{ task.name }}</h3><div layout=\"row\"><h4>{{ task.when.relative() }}</h4><h4>| every {{ task.frequency }} days</h4></div></div><md-icon aria-label=\"Update Time\" md-font-icon=\"material-icons\" ng-click=\"vm.update_time(task, 5)\" class=\"md-secondary\">check</md-icon></md-list-item></md-list></div>");
 }]);
