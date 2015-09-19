@@ -6,7 +6,8 @@ block content
       md-button.md-icon-button(ng-click="toggle_sidenav()")
         md-icon(aria-label="Menu", md-font-icon="material-icons") menu
       h1= title
-        |  | #{user.email}
+        if user
+          |  | #{user.email}
 
   section(layout="row" flex)
     any-sidenav

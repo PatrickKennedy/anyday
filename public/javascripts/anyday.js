@@ -161,20 +161,31 @@
         });
 
         function prep_result(tasks) {
-          tasks = tasks.map(function(task) {
-            task.when = Date.create(task.when)
-            task.
+          return tasks.map(function(task) {
+            return _prep_task(task)
           })
+        }
+        
+        function _prep_task(task) {
+          task.when = Date.create(task.when);
+          task.time_left = task.frequency - task.when.daysSince();
+          
+          return task;
+        }
+        
+        function _clean_task(task) {
+          delete task.time_left;
+          return task;
         }
 
         function format_tasks(tasks) {
           tasks.sort(function(a, b) {
-            a_delta = Date.create(a.when)
+            a_delta = Date.create(a.when);
           })
         }
 
         $scope.$on('any:new-task', function(event, task){
-          vm.tasks.push(task);
+          vm.tasks.push(_prep_task(task));
         })
 
         vm.update_time = function (task, past){
@@ -183,15 +194,14 @@
           if (past)
             task.when = Date.create(past + 'days ago');
 
-          delta_days = task.when.hoursAgo() / 24
+          delta_days = task.when.hoursAgo() / 24;
 
           if (!past)
             task.when = Date.create('now');
 
-          task.frequency = ((task.frequency + delta_days)/2).round(2)
+          task.frequency = ((task.frequency + delta_days)/2).round(2);
 
-
-          api.update(task).success(function(result) {
+          api.update(_clean_task(task)).success(function(result) {
             console.log(result);
           }).error(function(error){
             task = old_task;
