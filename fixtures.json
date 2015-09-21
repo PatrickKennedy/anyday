@@ -6,7 +6,7 @@
     },
     {
       "id": "take-shower",
-      "name": "Shower",
+      "name": "Take Shower",
       "frequency": "1"
     },
     {
@@ -66,13 +66,28 @@
     },
     {
       "id": "do-yoga",
-      "name": "do-yoga",
-      "frequency": "7"
+      "name": "Do Yoga",
+      "frequency": "3"
     },
     {
       "id": "workout",
-      "name": "workout",
+      "name": "Workout",
       "frequency": "3"
+    },
+    {
+      "id": "clean-kitchen",
+      "name": "Clean Kitchen",
+      "frequency": "5"
+    },
+    {
+      "id": "clean-bathroom",
+      "name": "Clean Bathroom",
+      "frequency": "10"
+    },
+    {
+      "id": "oil-cutting-board",
+      "name": "Oil Cutting Board",
+      "frequency": "14"
     },
     {
       "id": "change-oil",
