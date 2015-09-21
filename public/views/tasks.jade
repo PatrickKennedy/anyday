@@ -1,6 +1,6 @@
 div(id="tasks" ng-controller="AnyTasksController as vm")
   md-list
-    md-list-item.md-2-line(any-task ng-repeat="task in vm.tasks | order" ng-click="vm.show_bottom_sheet($event, task)")
+    md-list-item.md-2-line(ng-repeat="task in vm.tasks | orderBy:'time_left'" ng-click="vm.show_bottom_sheet($event, task)")
       .md-list-item-text
         h3 {{ task.name }}
         div(layout="row")
