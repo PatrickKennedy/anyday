@@ -154,6 +154,15 @@
       function($scope, $mdBottomSheet, api) {
         var vm = this;
         vm.tasks = [];
+        vm.grouped_tasks = {
+          overdue: {},
+          today: {},
+          soon: {},
+          this_week: {},
+          this_month: {},
+          sometime: {},
+        };
+        vm.current_group = null;
         api.tasks().success(function(result) {
           vm.tasks = prep_result(result);
         }).error(function(error){
@@ -165,28 +174,44 @@
             return _prep_task(task)
           })
         }
-        
+
         function _prep_task(task) {
           task.when = Date.create(task.when);
-          task.time_left = task.frequency - task.when.daysSince();
-          
+          task.time_left = task.frequency - task.when.daysAgo();
+
           return task;
         }
-        
+
         function _clean_task(task) {
           delete task.time_left;
           return task;
         }
 
-        function format_tasks(tasks) {
-          tasks.sort(function(a, b) {
-            a_delta = Date.create(a.when);
-          })
-        }
-
         $scope.$on('any:new-task', function(event, task){
           vm.tasks.push(_prep_task(task));
         })
+
+        vm.get_timestamp = function (time_left) {
+          var group = ''
+            , groups = [
+            function overdue(days) { return days < 0 ? 'overdue' : '' },
+            function today(days) { return (days >= 0 && days < 1) ? 'today' : '' },
+            function soon(days) { return (days >= 1 && days < 4) ? 'soon' : '' },
+            function this_week(days) { return (days >= 4 && days < 8) ? 'this week' : '' },
+            function this_month(days) { return (days >= 8 && days < 31) ? 'this month' : '' },
+            function sometime(days) { return (days >= 31) ? 'sometime' : '' },
+          ];
+          for (var i = 0; i < groups.length; i++) {
+            group = groups[i](time_left);
+            if (group)
+              break;
+          }
+          if (group == vm.current_group)
+            return '';
+
+          vm.current_group = group;
+          return group;
+        }
 
         vm.update_time = function (task, past){
           var old_task = Object.clone(task, true);
@@ -200,6 +225,7 @@
             task.when = Date.create('now');
 
           task.frequency = ((task.frequency + delta_days)/2).round(2);
+          task.time_left = task.frequency - task.when.daysAgo();
 
           api.update(_clean_task(task)).success(function(result) {
             console.log(result);

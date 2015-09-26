@@ -2,6 +2,7 @@ div(id="tasks" ng-controller="AnyTasksController as vm")
   md-list
     md-list-item.md-2-line(ng-repeat="task in vm.tasks | orderBy:'time_left'" ng-click="vm.show_bottom_sheet($event, task)")
       .md-list-item-text
+        h4 {{ vm.get_timestamp(task.time_left) }}
         h3 {{ task.name }}
         div(layout="row")
           h4 {{ task.when.relative() }}
