@@ -6,25 +6,29 @@ block content
       md-button.md-icon-button(ng-click="toggle_sidenav()")
         md-icon(aria-label="Menu", md-font-icon="material-icons") menu
       h1= title
+        if user
+          |  | #{user.email}
 
   section(layout="row" flex)
     any-sidenav
 
     #content(layout="column" layout-fill flex)
       md-content.md-padding(layout="column" flex)
-        md-card
-          md-card-content
-            unless user
+        unless user
+          md-card
+            md-card-content
               any-login-form
-
-            if user
-              p.md-headline Hi,
-              p.md-headline you can call me
-                span.md-title  #{user.email}.
-
-              any-fixtures-list
 
         if user
           md-card
+            md-toolbar.md-primary
+              h1.md-toolbar-tools Set A Reminder
+            md-card-content
+              if user
+                any-fixtures-list
+
+          md-card
+            md-toolbar.md-primary
+              h1.md-toolbar-tools Upcoming Tasks
             md-card-content
               any-tasks-list

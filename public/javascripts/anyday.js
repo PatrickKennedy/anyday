@@ -150,27 +150,97 @@
    */
   angular.module('any.tasks', ['tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
-      '$scope', '$mdBottomSheet', 'AnyAPI',
-      function($scope, $mdBottomSheet, api) {
+      '$scope', '$filter', '$mdBottomSheet', 'AnyAPI',
+      function($scope, $filter, $mdBottomSheet, api) {
         var vm = this;
         vm.tasks = [];
+        vm.grouped_tasks = {
+          overdue: {},
+          today: {},
+          soon: {},
+          this_week: {},
+          this_month: {},
+          sometime: {},
+        };
+        vm.current_group = null;
         api.tasks().success(function(result) {
-          vm.tasks = result;
+          vm.tasks = prep_result(result);
+          _order_tasks();
         }).error(function(error){
           console.log(error);
         });
 
+        function prep_result(tasks) {
+          return tasks.map(function(task) {
+            return _prep_task(task)
+          })
+        }
+
+        function _prep_task(task) {
+          task.when = Date.create(task.when);
+          task.time_left = task.frequency - task.when.daysAgo();
+
+          return task;
+        }
+
+        function _clean_task(task) {
+          delete task.time_left;
+          return task;
+        }
+        
+        // changes to task properties won't trigger a reorder on the task list
+        function _order_tasks() {
+          return $filter('orderBy')(vm.tasks, 'time_left');
+        }
+
         $scope.$on('any:new-task', function(event, task){
-          vm.tasks.push(task);
+          vm.tasks.push(_prep_task(task));
+          // order tasks here because it's not handled by the template anymore
+          _order_tasks();
         })
 
-        vm.update_time = function (task){
-          var old_when = task.when;
-          task.when = Date.create('now');
-          api.update(task).success(function(result) {
+        vm.get_timestamp = function (time_left, last) {
+          var group = ''
+            , groups = [
+            function overdue(days) { return days < 0 ? 'overdue' : '' },
+            function today(days) { return (days >= 0 && days < 1) ? 'today' : '' },
+            function soon(days) { return (days >= 1 && days < 4) ? 'soon' : '' },
+            function this_week(days) { return (days >= 4 && days < 8) ? 'this week' : '' },
+            function this_month(days) { return (days >= 8 && days < 31) ? 'this month' : '' },
+            function sometime(days) { return (days >= 31) ? 'sometime' : '' },
+          ];
+          for (var i = 0; i < groups.length; i++) {
+            group = groups[i](time_left);
+            if (group)
+              break;
+          }
+          if (group == vm.current_group)
+            return '';
+
+          vm.current_group = last ? null : group;
+          return group;
+        }
+
+        vm.update_time = function (task, past){
+          var old_task = Object.clone(task, true);
+
+          if (past)
+            task.when = Date.create(past + 'days ago');
+
+          delta_days = task.when.hoursAgo() / 24;
+
+          if (!past)
+            task.when = Date.create('now');
+
+          task.frequency = ((task.frequency + delta_days)/2).round(2);
+          task.time_left = task.frequency - task.when.daysAgo();
+
+          api.update(_clean_task(Object.clone(task, true))).success(function(result) {
             console.log(result);
+            // Resort the list because it itself isn't being updated it won't get digested
+            _order_tasks();
           }).error(function(error){
-            task.when = old_when;
+            task = old_task;
             console.log(error);
           });
         }
@@ -245,7 +315,7 @@
         var vm = this;
         vm.task_fixtures = [];
         vm.fixture;
-        vm.search_text = '';
+        vm.search_text = null;
         api.fixtures().success(function(result) {
           vm.task_fixtures = result;
         }).error(function(error){
@@ -262,16 +332,26 @@
         }
 
         vm.get_matches = function(search_text) {
+          var query
+              , results
+              , custom_result
+              ;
+
+          search_text = search_text.trim();
           query = angular.lowercase(search_text);
-          var results = vm.task_fixtures.filter(function(fixture) {
+
+          results = query ? vm.task_fixtures.filter(function(fixture) {
             return (fixture.name.toLowerCase().indexOf(query) === 0);
-          });
-          if (results.length != 1) {
-            results.unshift({
+          }) : vm.task_fixtures;
+
+          if (search_text && results.length <= 0) {
+            custom_result = {
               id: '',
               name: search_text,
               frequency: 1
-            });
+            };
+            results.unshift(custom_result);
+            vm.fixture = custom_result;
           }
 
           return results;
@@ -290,6 +370,13 @@
         }
       }
     ])
+    .filter('default', function () {
+      return function (item, def) {
+        if (item !== undefined)
+          return item;
+        return def;
+      }
+    })
     .directive('anyFixturesList', [
       function () {
         return {
