@@ -1,6 +1,6 @@
 {
   "name": "anyday",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Date Agnostic To-Do List",
   "main": "./bin/www",
   "author": "Patrick Kennedy <p@trickkennedy.com>",
@@ -45,5 +45,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "0.12.7"
   }
 }
