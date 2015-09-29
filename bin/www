@@ -48,10 +48,27 @@ async.waterfall([
     });
   },
 
-  /*
-   * Ceate TaskFixtures Table and Index
-   */
 
+  /*
+   * Create Sessions Table
+   */
+  function createTaskFixturesTable(connection, callback) {
+    // Create the table if needed.
+    r.tableList().contains('sessions').do(function(containsTable) {
+      return r.branch(
+        containsTable,
+        {created: 0},
+        r.tableCreate('sessions')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
+
+
+  /*
+   * Create TaskFixtures Table and Index, and install Fixtures from file
+   */
   function createTaskFixturesTable(connection, callback) {
     // Create the table if needed.
     r.tableList().contains('task_fixtures').do(function(containsTable) {
@@ -72,13 +89,13 @@ async.waterfall([
         , task_config = task_fixtures.shift()
         , task_ids = []
         ;
-    
+
     r
     .table(task_fixture_table)
     .insert(task_fixtures, {conflict: 'replace'})
     .run(connection, function(err) {
       if (err) return callback(err, connection);
-      
+
       if (task_config['delete_missing']) {
         task_fixtures.forEach(function (fixture) { task_ids.push(fixture['id']); });
         r
@@ -92,7 +109,7 @@ async.waterfall([
         return callback(err, connection);
       }
     });
-        
+
   },
   function createIndex(connection, callback) {
     // Create the index if needed.
@@ -112,6 +129,7 @@ async.waterfall([
       callback(err, connection);
     });
   },
+
 
   /*
    * Ceate Tasks Table and Index
@@ -140,6 +158,18 @@ async.waterfall([
       callback(err, connection);
     });
   },
+  function createIndex(connection, callback) {
+    //Create the index if needed.
+    r.table('tasks').indexList().contains('user_id').do(function(hasIndex) {
+      return r.branch(
+        hasIndex,
+        {created: 0},
+        r.table('tasks').indexCreate('user_id')
+      );
+    }).run(connection, function(err) {
+      callback(err, connection);
+    });
+  },
   function waitForIndex(connection, callback) {
     //Wait for the index to be ready.
     r.table('tasks').indexWait('when').run(connection, function(err, result) {
@@ -147,10 +177,10 @@ async.waterfall([
     });
   },
 
-  /*
-   * Ceate Users Table and Index
-   */
 
+  /*
+   * Create Users Table and Index
+   */
   function createUsersTable(connection, callback) {
     //Create the table if needed.
     r.tableList().contains('users').do(function(containsTable) {
@@ -181,6 +211,10 @@ async.waterfall([
       callback(err, connection);
     });
   }
+
+/*
+ * End of DB Management
+ */
 ], function(err, connection) {
   if(err) {
     console.error(err);

@@ -1,7 +1,30 @@
-div
-  ul
-    li
-      input(type="text" name="custom_name" ng-model="custom_name" ng-keyup="$event.keyCode == 13 && create_custom()")
-    li(ng-repeat="fixture in task_fixtures")
-      any-fixture(fixture="fixture" ng-click="create_from_fixture()")
+#fixtures(layout="column" ng-controller="AnyFixturesController as vm")
+  //-
+    md-select-on-match - reates a jittery experience; we set the result manually for now
+    md-no-cache - For now we're querying local data so we don't need to cache
+    md-delay - 150 seems to be the right delay to feel responsive and avoid jitter
+    md-min-length - Required to enable a dropdown with all the items
+  md-autocomplete(
+    md-floating-label="do something..."
+    md-autoselect="true"
+    md-select-on-match="false"
+    md-no-cache="true"
+    md-delay="150"
+    md-selected-item="vm.fixture"
+    md-search-text="vm.search_text"
+    md-min-length="0"
+    md-items="fixture in vm.get_matches(vm.search_text)"
+    md-item-text="fixture.name"
+  )
+    md-item-template
+      span(md-highlight-text="vm.search_text") {{ fixture.name }}
 
+  div(layout layout-sm="column")
+    md-input-container(flex)
+      label
+        | every {{ vm.fixture.frequency | default:"x" }} days
+      input(any-number type="number" name="frequency" ng-disabled="!vm.fixture" ng-model="vm.fixture.frequency")
+    md-datepicker(ng-model="vm.fixture.date" md-placeholder="Future Date")
+
+  .md-actions(layout="row" layout-align="end center")
+    md-button(ng-disabled="!vm.fixture" ng-click="vm.create_from_fixture()") Add

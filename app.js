@@ -11,7 +11,7 @@ var bodyParser = require('body-parser')
 
   , session = require('express-session')
   , SessionStore = require('session-rethinkdb')(session)
-  
+
   , passwordless = require('./controllers/passwordless')
 
   , api = require('./routes/api')
@@ -47,9 +47,10 @@ app.use(flash());
 // sessions
 app.use(session({
   secret: config.express.secret,
-  //store: new SessionStore({servers:[config.rethinkdb]}),
+  store: new SessionStore({servers:[config.rethinkdb]}),
   resave: false,
   saveUninitialized: false,
+  cookie: {maxAge: 30*24*60*60*1000},
 }));
 
 // authentication
@@ -104,4 +105,3 @@ function handleError(err, req, res, next) {
 
 
 module.exports = app;
-

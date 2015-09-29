@@ -1,8 +1,31 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /*padding: 50px;*/
+  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
 }
 
 a {
   color: #00B7FF;
+}
+
+md-list-item > *, md-list-item > .md-list-item-inner > *, md-list-item .md-list-item-inner > *, md-list-item .md-list-item-inner > .md-list-item-inner > * {
+  -webkit-user-select: none;
+  /* Chrome all / Safari all */
+  -moz-user-select: none;
+  /* Firefox all */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Likely future */
+}
+
+.md-grid-item-content {
+  height: 96px;
+}
+.md-grid-item-content md-icon {
+  height: 48px;
+  width: 48px;
+  font-size: 48px;
+}
+.md-grid-text {
+  padding-bottom: 5px;
 }

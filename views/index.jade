@@ -1,15 +1,34 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-    if user
-      | , #{user.email}
+  md-toolbar.md-whiteframe-z1(layout="row")
+    .md-toolbar-tools
+      md-button.md-icon-button(ng-click="toggle_sidenav()")
+        md-icon(aria-label="Menu", md-font-icon="material-icons") menu
+      h1= title
+        if user
+          |  | #{user.email}
 
-  unless user
-    any-login-form
+  section(layout="row" flex)
+    any-sidenav
 
-  any-fixtures-list
+    #content(layout="column" layout-fill flex)
+      md-content.md-padding(layout="column" flex)
+        unless user
+          md-card
+            md-card-content
+              any-login-form
 
-  any-tasks-list
+        if user
+          md-card
+            md-toolbar.md-primary
+              h1.md-toolbar-tools Set A Reminder
+            md-card-content
+              if user
+                any-fixtures-list
 
+          md-card
+            md-toolbar.md-primary
+              h1.md-toolbar-tools Upcoming Tasks
+            md-card-content
+              any-tasks-list

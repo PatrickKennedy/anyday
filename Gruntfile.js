@@ -90,8 +90,10 @@ module.exports = function(grunt) {
   //grunt.loadNpmTasks('grunt-node-inspector');
   //grunt.loadNpmTasks('grunt-nodemon');
   //grunt.loadNpmTasks('grunt-exec');
-  
+
   grunt.registerTask('install-fixture', []);
+
+  grunt.registerTask('dev', ['concurrent:dev'])
 
   // Default task(s).
   grunt.registerTask('default', []);
