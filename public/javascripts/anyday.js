@@ -150,8 +150,8 @@
    */
   angular.module('any.tasks', ['tasks.jade', 'any-task.jade'])
     .controller('AnyTasksController', [
-      '$scope', '$mdBottomSheet', 'AnyAPI',
-      function($scope, $mdBottomSheet, api) {
+      '$scope', '$filter', '$mdBottomSheet', 'AnyAPI',
+      function($scope, $filter, $mdBottomSheet, api) {
         var vm = this;
         vm.tasks = [];
         vm.grouped_tasks = {
@@ -165,6 +165,7 @@
         vm.current_group = null;
         api.tasks().success(function(result) {
           vm.tasks = prep_result(result);
+          _order_tasks();
         }).error(function(error){
           console.log(error);
         });
@@ -186,12 +187,19 @@
           delete task.time_left;
           return task;
         }
+        
+        // changes to task properties won't trigger a reorder on the task list
+        function _order_tasks() {
+          return $filter('orderBy')(vm.tasks, 'time_left');
+        }
 
         $scope.$on('any:new-task', function(event, task){
           vm.tasks.push(_prep_task(task));
+          // order tasks here because it's not handled by the template anymore
+          _order_tasks();
         })
 
-        vm.get_timestamp = function (time_left) {
+        vm.get_timestamp = function (time_left, last) {
           var group = ''
             , groups = [
             function overdue(days) { return days < 0 ? 'overdue' : '' },
@@ -209,7 +217,7 @@
           if (group == vm.current_group)
             return '';
 
-          vm.current_group = group;
+          vm.current_group = last ? null : group;
           return group;
         }
 
@@ -227,8 +235,10 @@
           task.frequency = ((task.frequency + delta_days)/2).round(2);
           task.time_left = task.frequency - task.when.daysAgo();
 
-          api.update(_clean_task(task)).success(function(result) {
+          api.update(_clean_task(Object.clone(task, true))).success(function(result) {
             console.log(result);
+            // Resort the list because it itself isn't being updated it won't get digested
+            _order_tasks();
           }).error(function(error){
             task = old_task;
             console.log(error);
