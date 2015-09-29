@@ -8,4 +8,4 @@ div(id="tasks" ng-controller="AnyTasksController as vm")
           div(layout="row")
             h4 {{ task.when.relative() }}
             h4 | every {{ task.frequency }} days
-      md-icon.md-secondary(aria-label="Update Time", md-font-icon="material-icons" ng-click="vm.update_time(task, 5)") check
+      md-icon.md-secondary(aria-label="Update Time", md-font-icon="material-icons" ng-click="vm.update_time(task)") check
