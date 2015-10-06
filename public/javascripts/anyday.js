@@ -231,6 +231,10 @@
 
           if (!past)
             task.when = Date.create('now');
+          
+          if (!task.analytics)
+            task.analytics = []
+          task.analytics.push(task.when);
 
           task.frequency = ((task.frequency + delta_days)/2).round(2);
           task.time_left = task.frequency - task.when.daysAgo();
