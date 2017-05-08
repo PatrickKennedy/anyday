@@ -14,7 +14,7 @@ try {
 
 config = Object.merge(config, local, true);
 
-config.rethinkdb.host = process.env.DOKKU_RETHINKDB_ANYDAY_PORT_28015_TCP_HOST || config.rethinkdb.host
+config.rethinkdb.host = process.env.DOKKU_RETHINKDB_ANYDAY_PORT_28015_TCP_ADDR || config.rethinkdb.host
 config.rethinkdb.port = process.env.DOKKU_RETHINKDB_ANYDAY_PORT_28015_TCP_PORT || config.rethinkdb.port
 
 config.email.api_key = process.env.EMAIL_API_KEY || config.email.api_key
