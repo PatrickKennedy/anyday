@@ -1,11 +1,14 @@
 {
   "name": "anyday",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Date Agnostic To-Do List",
   "main": "./bin/www",
   "author": "Patrick Kennedy <p@trickkennedy.com>",
   "repository": "https://github.com/PatrickKennedy/anyday/",
   "license": "ISC",
+  "engines": {
+    "node": "4.4"
+  },
   "dependencies": {
     "async": "^1.3.0",
     "body-parser": "~1.13.2",
